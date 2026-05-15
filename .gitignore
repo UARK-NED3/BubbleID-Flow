@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.venv/
+venv/
+
+# Notebooks
+.ipynb_checkpoints/
+
+# Data and model artifacts
+data/raw/
+data/interim/
+data/processed/
+outputs/
+models/
+*.pth
+*.pt
+*.onnx
+*.npy
+*.npz
+
+# High-speed image/video exports
+*.bmp
+*.cih
+*.cihx
+*.avi
+*.mp4
+*.mov
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

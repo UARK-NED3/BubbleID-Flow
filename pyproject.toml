@@ -1,0 +1,27 @@
+[project]
+name = "bubbleid-flow"
+version = "0.1.0"
+description = "Flow boiling adaptation tools for BubbleID-style bubble segmentation."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "numpy",
+  "opencv-python",
+  "pandas",
+  "pillow",
+  "pyyaml",
+  "tqdm",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest",
+  "ruff",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
