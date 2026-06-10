@@ -40,6 +40,14 @@ Set `PYTHONPATH` so scripts can import the package:
 $env:PYTHONPATH="src"
 ```
 
+For Detectron2/BubbleID-style fine-tuning, create the tested Windows environment:
+
+```powershell
+.\scripts\setup_windows_detectron2_env.ps1
+```
+
+See [docs/environment.md](docs/environment.md) for details.
+
 Crop a few representative frames:
 
 ```powershell
