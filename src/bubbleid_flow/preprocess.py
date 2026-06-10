@@ -1,6 +1,5 @@
 from pathlib import Path
 
-import cv2
 import numpy as np
 
 
@@ -24,6 +23,8 @@ def crop_array(image: np.ndarray, roi: tuple[int, int, int, int]) -> np.ndarray:
 
 def crop_image(image_path: str | Path, roi: tuple[int, int, int, int]) -> np.ndarray:
     """Read an image and crop to (x, y, width, height)."""
+    import cv2
+
     image = cv2.imread(str(image_path), cv2.IMREAD_COLOR)
     if image is None:
         raise ValueError(f"Could not read image: {image_path}")

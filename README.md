@@ -73,6 +73,39 @@ The baseline segmentation is only a visual triage tool. The intended production
 model is a fine-tuned instance segmentation model trained from manually labeled
 flow-boiling masks.
 
+## Learned Pixel Model
+
+The first annotation-driven model is a lightweight foreground/background pixel
+classifier. It uses Labelme polygons from multiple annotation folders and is a
+practical bridge until a Detectron2/BubbleID training environment is available.
+
+Train from Labelme annotations:
+
+```powershell
+python scripts/train_pixel_model.py `
+  --annotation-root "C:\path\to\student_annotations_1" `
+  --annotation-root "C:\path\to\student_annotations_2" `
+  --model-out "models\pixel_gaussian_flow_roi490_60.json" `
+  --report-out "outputs\evaluation\pixel_gaussian_flow_roi490_60.csv" `
+  --examples-out "outputs\evaluation\pixel_gaussian_examples_roi490_60" `
+  --roi 0,490,1024,60 `
+  --threshold 0.45 `
+  --min-area-px 20
+```
+
+Run the trained model on new images:
+
+```powershell
+python scripts/predict_pixel_model.py `
+  "C:\path\to\raw\Images\25gs_20C\57.5" `
+  "outputs\showcase\25gs_20C_57p5" `
+  --model "models\pixel_gaussian_flow_roi490_60.json" `
+  --limit 12
+```
+
+This model is not a replacement for Mask R-CNN. It is useful for quick
+annotation feedback, sanity checks, and representative segmentation overlays.
+
 ## Repository Layout
 
 ```text
