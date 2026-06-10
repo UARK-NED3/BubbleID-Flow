@@ -114,6 +114,49 @@ python scripts/predict_pixel_model.py `
 This model is not a replacement for Mask R-CNN. It is useful for quick
 annotation feedback, sanity checks, and representative segmentation overlays.
 
+## Detectron2 Flow-Boiling Mask R-CNN
+
+Convert Labelme instance polygons to COCO. For the current flow-boiling
+annotations, the near-wall bubble band is well represented by `0,485,1024,70`.
+
+```powershell
+python scripts/labelme_to_coco.py `
+  --annotation-root "C:\path\to\Abrar Hoq Fahim" `
+  --annotation-root "C:\path\to\Annotation (Flow Boiling)" `
+  --output-dir "data\processed\flow_coco_roi485_70" `
+  --holdout-every 5 `
+  --roi 0,485,1024,70
+```
+
+Fine-tune Mask R-CNN from COCO weights:
+
+```powershell
+python scripts/train_detectron2.py `
+  --train-json "data\processed\flow_coco_roi485_70\train_coco.json" `
+  --val-json "data\processed\flow_coco_roi485_70\val_coco.json" `
+  --output-dir "outputs\detectron2_flow_mrcnn_roi485_70" `
+  --max-iter 1000 `
+  --eval-period 250 `
+  --batch-size 1 `
+  --base-lr 0.00025
+```
+
+Run the trained model on raw flow-boiling images using the same ROI:
+
+```powershell
+python scripts/predict_detectron2.py `
+  "C:\path\to\raw\Images\25gs_20C\57.5" `
+  "outputs\detectron2_showcase\25gs_20C_57p5" `
+  --weights "outputs\detectron2_flow_mrcnn_roi485_70\model_final.pth" `
+  --roi 0,485,1024,70 `
+  --score-threshold 0.30 `
+  --limit 12
+```
+
+The predictor writes binary masks, red mask overlays, and instance-level
+visualizations. Use the ROI-aware Mask R-CNN path for real bubble segmentation;
+the earlier pixel model is retained only as a lightweight diagnostic baseline.
+
 ## Repository Layout
 
 ```text
