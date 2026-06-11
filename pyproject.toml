@@ -5,6 +5,7 @@ description = "Flow boiling adaptation tools for BubbleID-style bubble segmentat
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+  "matplotlib",
   "numpy",
   "opencv-python",
   "pandas",

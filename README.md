@@ -157,6 +157,31 @@ The predictor writes binary masks, red mask overlays, and instance-level
 visualizations. Use the ROI-aware Mask R-CNN path for real bubble segmentation;
 the earlier pixel model is retained only as a lightweight diagnostic baseline.
 
+## Projected Vapor Area Fraction
+
+Once a bubble mask is available, the cropped channel can be split into
+streamwise bins and summarized as projected vapor area fraction:
+
+```text
+projected vapor area fraction = bubble mask pixels in bin / total pixels in bin
+```
+
+Plot one representative frame:
+
+```powershell
+python scripts/plot_vapor_fraction_profile.py `
+  "C:\path\to\raw\frame.bmp" `
+  "outputs\vapor_fraction\case_name_frame" `
+  --weights "outputs\detectron2_flow_mrcnn_roi485_70\model_final.pth" `
+  --roi 0,485,1024,70 `
+  --bins 64 `
+  --score-threshold 0.30
+```
+
+This produces the cropped ROI image, binary bubble mask, mask overlay, profile
+CSV, and profile plot. The metric is a 2D projected vapor area fraction from the
+camera view, not a calibrated 3D void fraction.
+
 ## Repository Layout
 
 ```text
