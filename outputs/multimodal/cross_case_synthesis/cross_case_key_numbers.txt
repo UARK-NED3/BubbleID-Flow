@@ -1,0 +1,20 @@
+5gs_22C
+  heat flux range: 7.54 to 32.42 W/cm2
+  vapor area fraction range: 0.040 to 0.348
+  first state 25: vapor=0.072, AE energy rate=4.0
+  final state 52CHF: vapor=0.348, AE energy rate=176802.2
+10gs_22C
+  heat flux range: 6.51 to 36.23 W/cm2
+  vapor area fraction range: 0.051 to 0.301
+  first state 25V: vapor=0.123, AE energy rate=1922.5
+  final state 55V: vapor=0.162, AE energy rate=499702.8
+15gs_20C
+  heat flux range: 7.55 to 36.30 W/cm2
+  vapor area fraction range: 0.061 to 0.283
+  first state 25_ONSET: vapor=0.124, AE energy rate=26262.6
+  final state 55 CHF: vapor=0.283, AE energy rate=350.1
+25gs_20C
+  heat flux range: 10.84 to 41.76 W/cm2
+  vapor area fraction range: 0.078 to 0.198
+  first state 30_Onset: vapor=0.121, AE energy rate=10265.9
+  final state 59CHF: vapor=0.182, AE energy rate=1332165.0
