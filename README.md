@@ -189,6 +189,27 @@ This produces the cropped ROI image, binary bubble mask, mask overlay, profile
 CSV, and profile plot. The metric is a 2D projected vapor area fraction from the
 camera view, not a calibrated 3D void fraction.
 
+## Total Vapor Fraction and Bubble Statistics
+Once instance masks are available, the segmented entities are enumerated for 
+bubble count, and the total mask pixel area is divided by the region of 
+interest(ROI) domain to yield the vapor fraction.
+
+```powershell
+python scripts/vapor_fraction_and_bubble_count.py `
+  "C:\path\to\raw\Images\25gs_20C\57.5" `
+  "outputs\vf_and_bc\case_name_frame" `
+  --weights "outputs\detectron2_flow_mrcnn_roi485_70\model_final.pth" `
+  --roi 0,485,1024,70 `
+  --bins 64 `
+  --score-threshold 0.30 `
+  --cluster-size-threshold 350 `
+  --device cpu
+```
+The results are saved to a CSV file containing the total vapor fraction, total bubble 
+count, number of clustered bubbles, and number of single bubbles. Additionally,
+cropped overlay images are generated, showing each detected bubble outlined and labeled
+with a unique identification number for visual verification
+
 ## Repository Layout
 
 ```text
