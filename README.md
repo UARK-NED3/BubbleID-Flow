@@ -118,11 +118,10 @@ annotation feedback, sanity checks, and representative segmentation overlays.
 
 Trained model weights are archived on OSF:
 
-- OSF project: https://osf.io/p9nzt/
+- OSF project: https://osf.io/xnkh6/
 - Model folder: `models/detectron2_flow_mrcnn_roi485_70/`
-- Direct weights download: https://osf.io/download/6a2a2e8f09f1e3d2a3d14dae/
 - `model_final.pth` SHA256:
-  `10613DE030B35637BECB4FDA524F8D829E9B77B25E90AB9A670992E8A9B4B166`
+  `6f60969ce876f57a78b53fc61895c99b92cb2e1b6f0e0b30f01fa301236042cd`
 
 Convert Labelme instance polygons to COCO. For the current flow-boiling
 annotations, the near-wall bubble band is well represented by `0,485,1024,70`.
