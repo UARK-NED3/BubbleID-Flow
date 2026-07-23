@@ -191,8 +191,7 @@ camera view, not a calibrated 3D void fraction.
 
 ## Total Vapor Fraction and Bubble Statistics
 Once instance masks are available, the segmented entities are enumerated for 
-bubble count, and the total mask pixel area is divided by the region of 
-interest(ROI) domain to yield the vapor fraction.
+bubble count, and the total mask pixel area is divided by ROI domain to yield the vapor fraction.
 
 ```powershell
 python scripts/vapor_fraction_and_bubble_count.py `
@@ -208,7 +207,7 @@ python scripts/vapor_fraction_and_bubble_count.py `
 The results are saved to a CSV file containing the total vapor fraction, total bubble 
 count, number of clustered bubbles, and number of single bubbles. Additionally,
 cropped overlay images are generated, showing each detected bubble outlined and labeled
-with a unique identification number for visual verification
+with a unique identification number for visual verification.
 
 ## Repository Layout
 
