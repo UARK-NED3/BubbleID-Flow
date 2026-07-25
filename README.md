@@ -199,7 +199,6 @@ python scripts/vapor_fraction_and_bubble_count.py `
   "outputs\vf_and_bc\case_name_frame" `
   --weights "outputs\detectron2_flow_mrcnn_roi485_70\model_final.pth" `
   --roi 0,485,1024,70 `
-  --bins 64 `
   --score-threshold 0.30 `
   --cluster-size-threshold 350 `
   --device cpu
