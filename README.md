@@ -119,6 +119,8 @@ annotation feedback, sanity checks, and representative segmentation overlays.
 Trained model weights are archived on OSF:
 
 - OSF project: https://osf.io/xnkh6/
+- View-only record uploaded by Abrar Hoq Fahim:
+  https://osf.io/xnkh6/overview?view_only=09d63d516ca0489e90fa9b94d37b529e
 - Model folder: `models/detectron2_flow_mrcnn_roi485_70/`
 - `model_final.pth` SHA256:
   `6f60969ce876f57a78b53fc61895c99b92cb2e1b6f0e0b30f01fa301236042cd`
