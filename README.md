@@ -234,4 +234,4 @@ tests/                Unit tests for non-model utility code
 
 ## Status
 
-Initial segmentation utilities. No raw data, model weights, or generated masks are tracked.
+**Under Development**- BubbleID-Flow is an ongoing extension of the original **BubbleID** framework, being developed for bubble identification and analysis under flow-boiling conditions.
