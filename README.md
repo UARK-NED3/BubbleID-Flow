@@ -208,6 +208,19 @@ count, number of clustered bubbles, and number of single bubbles. Additionally,
 cropped overlay images are generated, showing each detected bubble outlined and labeled
 with a unique identification number for visual verification.
 
+## Ground-Truth Vapor Fraction and Bubble Count Calculation
+This script requires a folder containing manually annotated .bmp images with
+their corresponding .json labelme annotation files placed side by side. 
+It calculates the vapor fraction from the ratio of bubble-pixel area to ROI area
+and determines the total bubble count for the specified annotation class.
+
+```powershell
+python scripts/annotation_to_ground_truth.py `
+  "C:\path\to\test_images" `
+  --roi 0,485,1024,70 `
+  --output-dir "outputs\groundTruth"
+```
+
 ## Repository Layout
 
 ```text
