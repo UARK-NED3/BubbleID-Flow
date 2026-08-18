@@ -1,12 +1,12 @@
 # ATE Submission Package Audit
 
-Generated: 2026-08-17 20:59:52
+Generated: 2026-08-18 08:08:05
 
 ## Summary
 
 - BLOCKER: 6
-- WARN: 1
-- PASS: 61
+- WARN: 9
+- PASS: 53
 
 ## Metrics
 
@@ -58,31 +58,31 @@ Generated: 2026-08-17 20:59:52
 - **BLOCKER - Submission placeholder:** Line 315: contains 'should be finalized with all contributors'.
 - **PASS - Figure package:** Found Overleaf file: Figure_1_facility_data_streams.pdf
 - **PASS - Figure inclusion:** Referenced or packaged: Figure_1_facility_data_streams.pdf
-- **PASS - Figure outputs:** Found generated file: Figure_1_facility_data_streams.pdf
+- **WARN - Figure outputs:** Missing source output: outputs\ate_submission\figures\Figure_1_facility_data_streams.pdf
 - **PASS - Figure package:** Found Overleaf file: Figure_2_dataset_preparation_pipeline.pdf
 - **PASS - Figure inclusion:** Referenced or packaged: Figure_2_dataset_preparation_pipeline.pdf
-- **PASS - Figure outputs:** Found generated file: Figure_2_dataset_preparation_pipeline.pdf
+- **WARN - Figure outputs:** Missing source output: outputs\aug9_model_analysis\abrar_schematic_slide_1.pdf
 - **PASS - Figure package:** Found Overleaf file: Figure_3_finetuning_architecture.pdf
 - **PASS - Figure inclusion:** Referenced or packaged: Figure_3_finetuning_architecture.pdf
-- **PASS - Figure outputs:** Found generated file: Figure_3_finetuning_architecture.pdf
+- **WARN - Figure outputs:** Missing source output: outputs\aug9_model_analysis\abrar_schematic_slide_2.pdf
 - **PASS - Figure package:** Found Overleaf file: Figure_4_aug9_model_outputs.pdf
 - **PASS - Figure inclusion:** Referenced or packaged: Figure_4_aug9_model_outputs.pdf
-- **PASS - Figure outputs:** Found generated file: Figure_4_aug9_model_outputs.pdf
+- **WARN - Figure outputs:** Missing source output: outputs\aug9_model_analysis\Figure_4_aug9_model_outputs.pdf
 - **PASS - Figure package:** Found Overleaf file: Figure_5_segmentation_robustness.pdf
 - **PASS - Figure inclusion:** Referenced or packaged: Figure_5_segmentation_robustness.pdf
 - **PASS - Figure outputs:** Found generated file: Figure_5_segmentation_robustness.pdf
 - **PASS - Figure package:** Found Overleaf file: Figure_6_segmentation_baselines.pdf
 - **PASS - Figure inclusion:** Referenced or packaged: Figure_6_segmentation_baselines.pdf
-- **PASS - Figure outputs:** Found generated file: Figure_6_segmentation_baselines.pdf
+- **WARN - Figure outputs:** Missing source output: outputs\aug9_model_analysis\segmentation_baselines\Figure_segmentation_baselines.pdf
 - **PASS - Figure package:** Found Overleaf file: Figure_5_aug9_optical_results.pdf
 - **PASS - Figure inclusion:** Referenced or packaged: Figure_5_aug9_optical_results.pdf
-- **PASS - Figure outputs:** Found generated file: Figure_5_aug9_optical_results.pdf
+- **WARN - Figure outputs:** Missing source output: outputs\aug9_model_analysis\Figure_5_aug9_optical_results.pdf
 - **PASS - Figure package:** Found Overleaf file: Figure_7_optical_thermal_association.pdf
 - **PASS - Figure inclusion:** Referenced or packaged: Figure_7_optical_thermal_association.pdf
-- **PASS - Figure outputs:** Found generated file: Figure_7_optical_thermal_association.pdf
+- **WARN - Figure outputs:** Missing source output: outputs\aug9_model_analysis\optical_thermal_association\Figure_6_optical_thermal_association.pdf
 - **PASS - Figure package:** Found Overleaf file: Graphical_Abstract.pdf
 - **PASS - Figure inclusion:** Referenced or packaged: Graphical_Abstract.pdf
-- **PASS - Figure outputs:** Found generated file: Graphical_Abstract.pdf
+- **WARN - Figure outputs:** Missing source output: outputs\aug9_model_analysis\Graphical_Abstract.pdf
 - **PASS - Citations:** All cited keys exist in references.bib.
 - **WARN - Citations:** Unused bib entries: Comelli2024Image, Na2025Thermal, Na2026Resource, Soibam2023Segmentation
 - **PASS - Highlights:** Five highlights are present.
