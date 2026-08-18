@@ -1,0 +1,37 @@
+case_label,state_label,state_voltage,baseline_active_column_threshold,active_threshold_sensitivity_status,active_thresholds_evaluated,active_length_baseline_mean,active_length_min_mean,active_length_max_mean,active_length_threshold_range,active_length_max_abs_delta_from_baseline,most_sensitive_threshold,threshold_sensitivity_limit,next_verification_needed
+5gs_22C,25,25.0,0.05,missing_threshold_sweep,,0.2796223958333333,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,27.5,27.5,0.05,missing_threshold_sweep,,0.2734375,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,30,30.0,0.05,missing_threshold_sweep,,0.30029296875,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,35,35.0,0.05,missing_threshold_sweep,,0.3670247395833333,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,37.5,37.5,0.05,missing_threshold_sweep,,0.3976236979166667,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,40,40.0,0.05,missing_threshold_sweep,,0.4384765625,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,42.5,42.5,0.05,missing_threshold_sweep,,0.4944661458333333,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,45,45.0,0.05,missing_threshold_sweep,,0.5284830729166666,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,47.5,47.5,0.05,missing_threshold_sweep,,0.6661783854166666,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,49,49.0,0.05,missing_threshold_sweep,,0.69775390625,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,50,50.0,0.05,missing_threshold_sweep,,0.75341796875,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+5gs_22C,52CHF,52.0,0.05,missing_threshold_sweep,,0.80517578125,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+10gs_22C,25V,25.0,0.05,missing_threshold_sweep,,0.2776692708333333,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+10gs_22C,30V,30.0,0.05,missing_threshold_sweep,,0.3030598958333333,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+10gs_22C,35V,35.0,0.05,missing_threshold_sweep,,0.3097330729166667,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+10gs_22C,40V,40.0,0.05,missing_threshold_sweep,,0.3826497395833333,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+10gs_22C,50V,50.0,0.05,missing_threshold_sweep,,0.6857096354166666,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+10gs_22C,52.5V,52.5,0.05,missing_threshold_sweep,,0.72021484375,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+10gs_22C,55V,55.0,0.05,missing_threshold_sweep,,0.5706380208333334,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+15gs_20C,25_ONSET,25.0,0.05,missing_threshold_sweep,,0.2650146484375,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+15gs_20C,30,30.0,0.05,missing_threshold_sweep,,0.2119140625,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+15gs_20C,35,35.0,0.05,missing_threshold_sweep,,0.306640625,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+15gs_20C,40,40.0,0.05,missing_threshold_sweep,,0.302490234375,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+15gs_20C,45,45.0,0.05,missing_threshold_sweep,,0.4329833984375,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+15gs_20C,50,50.0,0.05,missing_threshold_sweep,,0.5826416015625,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+15gs_20C,52.5,52.5,0.05,missing_threshold_sweep,,0.63330078125,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+15gs_20C,54,54.0,0.05,missing_threshold_sweep,,0.6778564453125,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+15gs_20C,55 CHF,55.0,0.05,missing_threshold_sweep,,0.6785888671875,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+25gs_20C,30_Onset,30.0,0.05,missing_threshold_sweep,,0.27587890625,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+25gs_20C,35,35.0,0.05,missing_threshold_sweep,,0.2708333333333333,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+25gs_20C,40,40.0,0.05,missing_threshold_sweep,,0.2967122395833333,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+25gs_20C,45,45.0,0.05,missing_threshold_sweep,,0.2840169270833333,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+25gs_20C,50,50.0,0.05,missing_threshold_sweep,,0.4615885416666667,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+25gs_20C,55,55.0,0.05,missing_threshold_sweep,,0.5388997395833334,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+25gs_20C,57.5,57.5,0.05,missing_threshold_sweep,,0.59912109375,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.
+25gs_20C,59CHF,59.0,0.05,missing_threshold_sweep,,0.5652669270833334,,,,,,per-frame active-length threshold sweep missing,Rerun per-case image analysis with --active-column-sensitivity-thresholds.

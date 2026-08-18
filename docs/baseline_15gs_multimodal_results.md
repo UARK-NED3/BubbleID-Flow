@@ -17,14 +17,17 @@ vapor metrics, reduced thermal data, and acoustic-emission hit features for the
 - Acoustic-emission hit file:
   `C:\Users\hanhu\Box\NED3_Share\Ishraq Hossain\CWRU\test17_17th Oct_Friday\3\HIT_15gs_20C.TXT`
 - Segmentation model:
-  `outputs\detectron2_flow_mrcnn_roi485_70\model_final.pth`
+  `C:\Users\hanhu\Box\NED3_Share\0_BubbleID\BubbleID-Flow\detectron2_flow_mrcnn_roi485_70\model_final.pth`
+- Preliminary analysis/setup source:
+  `C:\Users\hanhu\Box\NED3_Share\0_NSF_CASIS_FBCE_Project\CWRU_visit_Oct_13_17_2025`
 
 ## Analysis Settings
 
 - ROI: `0,485,1024,70`
 - Mask R-CNN score threshold: `0.30`
+- Active vapor column threshold: `0.05` projected vapor occupancy
 - Image sample: 8 evenly spaced frames per voltage state
-- Thermal state matching: rows where `abs(voltage) ± 0.75 V` around the image-folder voltage
+- Thermal state matching: rows where `abs(voltage) +/- 0.75 V` around the image-folder voltage
 - AE state matching: provisional test-relative time windows from thermal state matching
 
 ## Outputs
@@ -62,6 +65,9 @@ claims about exact AE lead/lag behavior.
 - The image model may merge dense adjacent bubbles, so bubble count and size
   distributions should be treated more cautiously than total vapor coverage.
 - AE alignment is provisional.
+- Test notes flag that AE sensor mounting may have been inadequate, so absolute
+  AE magnitudes and channel-to-channel comparisons should be treated as
+  preliminary until coupling is audited.
 - Camera pixel-to-length calibration and camera field-of-view location relative
   to thermocouple positions still need to be verified.
 

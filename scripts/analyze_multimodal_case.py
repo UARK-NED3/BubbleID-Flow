@@ -15,6 +15,18 @@ from detectron2.engine import DefaultPredictor
 
 from bubbleid_flow.paths import iter_images
 from bubbleid_flow.preprocess import crop_array, parse_roi
+from bubbleid_flow.thermal_windows import (
+    choose_operating_window,
+    infer_time_gap_threshold,
+    max_internal_gap_s,
+    split_contiguous_windows,
+)
+from bubbleid_flow.vapor_fraction import (
+    DEFAULT_ACTIVE_COLUMN_THRESHOLD,
+    active_length_threshold_sweep,
+    projected_mask_metrics,
+    threshold_label,
+)
 
 
 def main() -> None:
@@ -32,6 +44,21 @@ def main() -> None:
     parser.add_argument("--frames-per-state", type=int, default=12)
     parser.add_argument("--bins", type=int, default=64)
     parser.add_argument("--score-threshold", type=float, default=0.30)
+    parser.add_argument(
+        "--detections-per-image",
+        type=int,
+        default=None,
+        help="Optional Detectron2 TEST.DETECTIONS_PER_IMAGE override.",
+    )
+    parser.add_argument("--active-column-threshold", type=float, default=DEFAULT_ACTIVE_COLUMN_THRESHOLD)
+    parser.add_argument(
+        "--active-column-sensitivity-thresholds",
+        default="0.025,0.05,0.075",
+        help=(
+            "Comma-separated projected-vapor column thresholds used to audit "
+            "active-length sensitivity. Include --active-column-threshold in this list."
+        ),
+    )
     parser.add_argument("--voltage-tolerance", type=float, default=0.75)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     args = parser.parse_args()
@@ -42,12 +69,19 @@ def main() -> None:
     overlay_dir.mkdir(parents=True, exist_ok=True)
 
     states = discover_states(Path(args.image_root))
-    predictor = DefaultPredictor(_build_cfg(args.weights, args.score_threshold, args.device))
+    predictor = DefaultPredictor(
+        _build_cfg(args.weights, args.score_threshold, args.device, args.detections_per_image)
+    )
     image_summary, frame_metrics = summarize_image_states(
         states=states,
         predictor=predictor,
         roi=parse_roi(args.roi),
         frames_per_state=args.frames_per_state,
+        active_column_threshold=args.active_column_threshold,
+        active_column_sensitivity_thresholds=parse_thresholds(
+            args.active_column_sensitivity_thresholds,
+            required_threshold=args.active_column_threshold,
+        ),
         overlay_dir=overlay_dir,
     )
     thermal_summary = summarize_thermal_states(
@@ -105,6 +139,23 @@ def parse_state_voltage(label: str) -> float | None:
     return float(match.group(0)) if match else None
 
 
+def parse_thresholds(text: str, *, required_threshold: float | None = None) -> list[float]:
+    thresholds = []
+    for item in text.split(","):
+        item = item.strip()
+        if not item:
+            continue
+        threshold = float(item)
+        if not 0 <= threshold <= 1:
+            raise ValueError("active-column sensitivity thresholds must be between 0 and 1")
+        thresholds.append(threshold)
+    if required_threshold is not None and not any(
+        abs(threshold - required_threshold) < 1e-12 for threshold in thresholds
+    ):
+        thresholds.append(required_threshold)
+    return sorted(set(thresholds))
+
+
 def sample_evenly(paths: list[Path], count: int) -> list[Path]:
     if count <= 0 or len(paths) <= count:
         return paths
@@ -117,26 +168,44 @@ def summarize_image_states(
     predictor: DefaultPredictor,
     roi: tuple[int, int, int, int],
     frames_per_state: int,
+    active_column_threshold: float,
+    active_column_sensitivity_thresholds: list[float],
     overlay_dir: Path,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     rows = []
     frame_rows = []
     for state in states:
-        image_paths = sample_evenly(iter_images(state["path"]), frames_per_state)
+        available_image_paths = iter_images(state["path"])
+        image_paths = sample_evenly(available_image_paths, frames_per_state)
         representative_index = len(image_paths) // 2 if image_paths else -1
+        sample_fraction = (
+            len(image_paths) / len(available_image_paths) if available_image_paths else np.nan
+        )
         for frame_index, image_path in enumerate(image_paths):
             image = cv2.imread(str(image_path), cv2.IMREAD_COLOR)
             if image is None:
                 raise ValueError(f"Could not read image: {image_path}")
             cropped = crop_array(image, roi)
             combined = predict_combined_mask(predictor, cropped)
-            metrics = mask_metrics(combined)
+            metrics = projected_mask_metrics(
+                combined,
+                active_column_threshold=active_column_threshold,
+            )
+            sensitivity_metrics = active_length_threshold_sweep(
+                combined,
+                active_column_sensitivity_thresholds,
+            )
             frame_rows.append(
                 {
                     "state_label": state["state_label"],
                     "state_voltage": state["state_voltage"],
                     "frame_name": image_path.name,
+                    "available_frames_in_state": len(available_image_paths),
+                    "frames_requested_per_state": frames_per_state,
+                    "sample_fraction": sample_fraction,
+                    "active_column_threshold": active_column_threshold,
                     **metrics,
+                    **sensitivity_metrics,
                 }
             )
             if frame_index == representative_index:
@@ -145,13 +214,32 @@ def summarize_image_states(
 
     frame_metrics = pd.DataFrame(frame_rows)
     grouped = frame_metrics.groupby(["state_label", "state_voltage"], as_index=False)
-    summary = grouped.agg(
-        image_frames=("frame_name", "count"),
-        vapor_area_fraction_mean=("vapor_area_fraction", "mean"),
-        vapor_area_fraction_std=("vapor_area_fraction", "std"),
-        active_length_fraction_mean=("active_length_fraction", "mean"),
-        vapor_front_x_px_mean=("vapor_front_x_px", "mean"),
-    )
+    aggregations = {
+        "image_frames": ("frame_name", "count"),
+        "available_frames_in_state": ("available_frames_in_state", "first"),
+        "frames_requested_per_state": ("frames_requested_per_state", "first"),
+        "sample_fraction": ("sample_fraction", "first"),
+        "active_column_threshold": ("active_column_threshold", "first"),
+        "vapor_area_fraction_mean": ("vapor_area_fraction", "mean"),
+        "vapor_area_fraction_std": ("vapor_area_fraction", "std"),
+        "active_length_fraction_mean": ("active_length_fraction", "mean"),
+        "vapor_front_x_px_mean": ("vapor_front_x_px", "mean"),
+    }
+    for threshold in active_column_sensitivity_thresholds:
+        column = f"active_length_fraction_thr_{threshold_label(threshold)}"
+        if column in frame_metrics.columns:
+            aggregations[f"{column}_mean"] = (column, "mean")
+    if "active_length_threshold_sensitivity_range" in frame_metrics.columns:
+        aggregations["active_length_threshold_sensitivity_range_mean"] = (
+            "active_length_threshold_sensitivity_range",
+            "mean",
+        )
+    if "active_length_thresholds_evaluated" in frame_metrics.columns:
+        aggregations["active_length_thresholds_evaluated"] = (
+            "active_length_thresholds_evaluated",
+            "first",
+        )
+    summary = grouped.agg(**aggregations)
     return summary, frame_metrics
 
 
@@ -160,18 +248,6 @@ def predict_combined_mask(predictor: DefaultPredictor, image: np.ndarray) -> np.
     instances = outputs["instances"].to("cpu")
     masks = instances.pred_masks.numpy() if instances.has("pred_masks") else np.empty((0, *image.shape[:2]))
     return np.any(masks, axis=0).astype(np.uint8) * 255 if len(masks) else np.zeros(image.shape[:2], dtype=np.uint8)
-
-
-def mask_metrics(mask: np.ndarray) -> dict:
-    mask_bool = mask > 0
-    column_fraction = mask_bool.mean(axis=0)
-    active_columns = np.flatnonzero(column_fraction > 0.05)
-    vapor_front = float(active_columns.max()) if len(active_columns) else np.nan
-    return {
-        "vapor_area_fraction": float(mask_bool.mean()),
-        "active_length_fraction": float(len(active_columns) / mask.shape[1]),
-        "vapor_front_x_px": vapor_front,
-    }
 
 
 def summarize_thermal_states(
@@ -188,26 +264,52 @@ def summarize_thermal_states(
     time_col = find_column(combined, ["Time [s]"])
     power_col = find_column(combined, ["Power"])
     heat_flux_col = find_column(combined, ["Heat Flux"])
+    mass_flow_col = find_column(combined, ["Mass Flow Rate"])
+    velocity_col = find_column(combined, ["Fluid Velocity"])
     inlet_subcool_col = find_column(combined, ["Inlet Subcooling"])
     pin_col = find_column(combined, ["Inlet Pressure"])
     pout_col = find_column(combined, ["Outlet Pressure"])
+    tin_col = find_column(combined, ["Inlet Temperature"])
+    tout_col = find_column(combined, ["Outlet Temperature"])
+    wall_temperature_cols = [
+        col for col in combined.columns if str(col).startswith("Temperature at x")
+    ]
     htc_cols = [col for col in combined.columns if "Heat Transfer Coefficient" in str(col)]
     quality_cols = [col for col in combined.columns if str(col).startswith("Quality at x")]
 
     combined["_abs_voltage"] = thermal_input[voltage_col].abs().to_numpy()
+    gap_threshold_s = infer_time_gap_threshold(combined, time_col)
     rows = []
+    previous_window_end_s: float | None = None
     for state in states:
         target = state["state_voltage"]
-        selected = combined[(combined["_abs_voltage"] - target).abs() <= voltage_tolerance]
-        if selected.empty:
+        candidate_rows = combined[(combined["_abs_voltage"] - target).abs() <= voltage_tolerance]
+        if candidate_rows.empty:
             rows.append(
                 {
                     "state_label": state["state_label"],
                     "state_voltage": target,
                     "thermal_rows": 0,
+                    "thermal_candidate_rows": 0,
+                    "thermal_window_blocks": 0,
+                    "thermal_window_selection": "no_voltage_matched_rows",
+                    "thermal_window_gap_threshold_s": gap_threshold_s,
                 }
             )
             continue
+        windows = split_contiguous_windows(
+            candidate_rows,
+            time_col,
+            max_gap_s=gap_threshold_s,
+        )
+        selection = choose_operating_window(
+            windows,
+            time_col,
+            previous_end_s=previous_window_end_s,
+            gap_threshold_s=gap_threshold_s,
+        )
+        selected = selection.data
+        previous_window_end_s = float(selected[time_col].max())
         heat_flux = selected[heat_flux_col]
         if "W/m²" in heat_flux_col or "W/m2" in heat_flux_col:
             heat_flux_w_cm2 = heat_flux / 10_000.0
@@ -218,13 +320,37 @@ def summarize_thermal_states(
                 "state_label": state["state_label"],
                 "state_voltage": target,
                 "thermal_rows": len(selected),
+                "thermal_candidate_rows": len(candidate_rows),
+                "thermal_window_blocks": selection.block_count,
+                "thermal_window_block_index": selection.block_index,
+                "thermal_window_selection": selection.reason,
+                "thermal_window_gap_threshold_s": selection.gap_threshold_s,
+                "thermal_window_duration_s": float(selected[time_col].max() - selected[time_col].min()),
+                "thermal_window_max_internal_gap_s": max_internal_gap_s(selected, time_col),
                 "time_start_s": float(selected[time_col].min()),
                 "time_end_s": float(selected[time_col].max()),
                 "voltage_mean_v": float(selected["_abs_voltage"].mean()),
                 "power_mean_w": float(selected[power_col].mean()),
+                "power_std_w": float(selected[power_col].std(ddof=1)),
                 "heat_flux_mean_w_cm2": float(heat_flux_w_cm2.mean()),
+                "heat_flux_std_w_cm2": float(heat_flux_w_cm2.std(ddof=1)),
+                "mass_flow_mean_kg_s": float(selected[mass_flow_col].mean()),
+                "mass_flow_std_kg_s": float(selected[mass_flow_col].std(ddof=1)),
+                "fluid_velocity_mean_m_s": float(selected[velocity_col].mean()),
                 "inlet_subcooling_mean_c": float(selected[inlet_subcool_col].mean()),
                 "pressure_drop_mean_kpa": float((selected[pin_col] - selected[pout_col]).mean()),
+                "inlet_temperature_mean_c": float(selected[tin_col].mean()),
+                "outlet_temperature_mean_c": float(selected[tout_col].mean()),
+                "wall_temperature_mean_c": (
+                    float(selected[wall_temperature_cols].mean(axis=1).mean())
+                    if wall_temperature_cols
+                    else np.nan
+                ),
+                "wall_temperature_std_c": (
+                    float(selected[wall_temperature_cols].mean(axis=1).std(ddof=1))
+                    if wall_temperature_cols
+                    else np.nan
+                ),
                 "htc_mean_w_m2k": float(selected[htc_cols].mean(axis=1).mean()) if htc_cols else np.nan,
                 "quality_x7_mean": float(selected[quality_cols[-1]].mean()) if quality_cols else np.nan,
             }
@@ -420,7 +546,7 @@ def safe_name(value: str) -> str:
     return re.sub(r"[^A-Za-z0-9_.-]+", "_", value)
 
 
-def _build_cfg(weights: str, score_threshold: float, device: str):
+def _build_cfg(weights: str, score_threshold: float, device: str, detections_per_image: int | None):
     cfg = get_cfg()
     cfg.merge_from_file(
         model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
@@ -432,6 +558,10 @@ def _build_cfg(weights: str, score_threshold: float, device: str):
     cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[8], [16], [32], [64], [128]]
     cfg.INPUT.MIN_SIZE_TEST = 640
     cfg.INPUT.MAX_SIZE_TEST = 900
+    if detections_per_image is not None:
+        if detections_per_image <= 0:
+            raise ValueError("detections_per_image must be positive")
+        cfg.TEST.DETECTIONS_PER_IMAGE = detections_per_image
     return cfg
 
 

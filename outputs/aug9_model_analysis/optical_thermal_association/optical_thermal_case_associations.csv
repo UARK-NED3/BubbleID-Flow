@@ -1,0 +1,5 @@
+case_label,states,spearman_voltage_vs_heat_flux,spearman_heat_flux_vs_projected_area,spearman_heat_flux_vs_mean_temperature,spearman_projected_area_vs_mean_temperature
+5gs_22C,12,1.0,1.0,1.0,1.0
+10gs_22C,7,1.0,0.8928571428571429,1.0,0.8928571428571429
+15gs_20C,9,1.0,1.0,1.0,1.0
+25gs_20C,8,1.0,0.9285714285714287,1.0,0.9285714285714287

@@ -1,115 +1,68 @@
-# Key Figures for the BubbleID-Flow Multimodal Manuscript
+# Key Figures for the BubbleID-Flow ATE Manuscript
+
+The canonical figure package is the flat directory
+`overleaf_applied_thermal_engineering`. Numerical plots are generated from the
+Aug. 9 checkpoint evidence by `scripts/prepare_aug9_optical_results.py`.
 
 ## Figure 1. Experimental Facility and Data Streams
 
-**Purpose:** Establish the physical experiment and show why the dataset is multimodal.
+Establishes the loop, image, thermal, and acoustic data streams and the four
+operating cases. The camera-to-heater and camera-to-thermocouple registration is
+not calibrated, so the figure supports facility context rather than local
+optical-thermal mapping.
 
-**Panel plan:**
+## Figure 2. Annotation Dataset Preparation
 
-- Flow-loop schematic with pump, preheater, heated microchannel test section, condenser/chiller, and DAQ.
-- Test-section photograph or schematic with heater, flow direction, thermocouple locations, AE sensor locations, and camera field of view.
-- Test matrix table: `5gs_22C`, `10gs_22C`, `15gs_20C`, `25gs_20C`.
+Directly uses Abrar Fahim's schematic showing frame selection, Labelme
+annotation, near-wall ROI cropping, and COCO conversion. The manuscript states
+that `bubble` and `bubble_cluster` labels are merged into one vapor-region class.
 
-**Status:** Needs polished schematic. Information is available from visit summary slides and SOP documents.
+File: `Figure_2_dataset_preparation_pipeline.pdf`.
 
-## Figure 2. BubbleID-Flow Vision Workflow
+## Figure 3. Fine-Tuning Architecture
 
-**Purpose:** Show how raw images become quantitative vapor metrics.
+Directly uses Abrar Fahim's Mask R-CNN fine-tuning schematic. The caption and
+methods provide the audited settings: ResNet-50 FPN, 2000 iterations, batch size
+1, learning rate `2.5e-4`, anchor sizes 8-128 px, and one output class.
 
-**Panel plan:**
+File: `Figure_3_finetuning_architecture.pdf`.
 
-- Raw ROI image.
-- Mask R-CNN bubble mask.
-- Overlay.
-- Streamwise projected vapor area fraction profile.
+## Figure 4. Updated Model Outputs
 
-**Available source:** Existing BubbleID-Flow outputs and `plot_vapor_fraction_profile.py`.
+Shows raw and predicted 45 V ROIs for all four cases using the Aug. 9 checkpoint,
+score threshold 0.30, and 300 detections per image. It visually anchors the
+combined-mask metric and documents merge, missed-small-structure, and enclosed-
+liquid failure modes.
 
-## Figure 3. Baseline Integrated Case: `15gs_20C`
+Source: `outputs/aug9_model_analysis/Figure_4_aug9_model_outputs.pdf`.
 
-**Purpose:** Demonstrate the complete image + thermal + acoustic analysis pipeline for one case.
+## Figure 5. Updated Optical Results
 
-**Current file:**
+Remade in the manuscript's Matplotlib style rather than using the supplied
+OriginLab plots. Panels show all 37 provided state summaries versus voltage,
+matched heat flux, every available 45 V frame, and the direct 45 V reproduction
+comparison. This is the primary quantitative figure.
 
-```text
-outputs/multimodal/15gs_20C_baseline/15gs_20C_integrated_baseline_panel.png
-```
+Source: `outputs/aug9_model_analysis/Figure_5_aug9_optical_results.pdf`.
 
-**Panel contents:**
+## Figure 6. Thermal and Acoustic Context
 
-- Heat flux versus test-relative time.
-- Projected vapor area fraction versus voltage state.
-- Mean HTC and heat flux versus voltage state.
-- AE hit rate and AE absolute-energy rate versus voltage state.
+Remade in the manuscript style. It joins updated optical coverage to heat flux,
+mean HTC, and quality-tagged AE energy. Open markers denote caution windows and
+crosses denote overlap-blocked windows. AE remains screening-level because
+trigger synchronization and sensor coupling are unverified.
 
-**Story:** Vapor coverage increases strongly above about `45 V`, coincident with increased thermal forcing and elevated AE activity.
+Source: `outputs/aug9_model_analysis/Figure_6_aug9_multimodal_context.pdf`.
 
-## Figure 4. Representative Bubble Masks Across the `15gs_20C` Sweep
+## Figure 7. Synchronization Audit
 
-**Purpose:** Visually anchor the quantitative trend in Figure 3.
+Retains the state-window audit for the 15 g/s case. It explains why no acoustic
+lead-lag or regime-classification claim is made.
 
-**Current file:**
+## Graphical Abstract
 
-```text
-outputs/multimodal/15gs_20C_baseline/15gs_20C_representative_overlay_sheet.png
-```
+Regenerated from the Aug. 9 representative ROI, mask overlay, and heat-flux plot.
+It reports the internal-holdout combined-mask metrics and 45 V reproduction MAE,
+without the superseded active-vapor-length metric.
 
-**Story:** The vapor-covered region grows downstream and occupies more of the near-wall band as voltage increases from onset toward CHF-adjacent states.
-
-## Figure 5. Cross-Case Multimodal Signatures
-
-**Purpose:** Show that the trend is not unique to one case.
-
-**Current file:**
-
-```text
-outputs/multimodal/cross_case_synthesis/cross_case_multimodal_story.png
-```
-
-**Panel contents:**
-
-- Projected vapor area fraction versus heat flux.
-- AE absolute-energy rate versus projected vapor area fraction.
-- Mean HTC versus projected vapor area fraction.
-- Active vapor length fraction versus heat flux.
-
-**Story:** Image-derived vapor coverage and active vapor length generally rise with heat flux across the four operating cases; AE energy broadly rises with vapor activity but exhibits case-specific scatter, which is physically reasonable because sensor coupling, event intermittency, and flow condition affect AE transfer.
-
-## Figure 6. Normalized Multimodal State Map
-
-**Purpose:** Provide a compact overview of all states and all modalities.
-
-**Current file:**
-
-```text
-outputs/multimodal/cross_case_synthesis/cross_case_state_map.png
-```
-
-**Recommended placement:** Supplementary figure or late Results figure.
-
-**Story:** High-voltage/CHF-adjacent states cluster as high heat-flux, high visual-vapor, and high thermal-response states, while AE energy highlights some but not all of the same transitions.
-
-## Figure 7. Methodological Limitation and Validation Panel
-
-**Purpose:** Make the paper defensible by showing segmentation strengths and failure modes.
-
-**Panel plan:**
-
-- Example accurate masks.
-- Example merged bubbles.
-- Example onset-state false positive.
-- Manual annotation comparison for a held-out annotated frame.
-
-**Status:** Needed before journal submission.
-
-## Figure 8. Synchronization and Signal-Window Audit
-
-**Purpose:** Strengthen the acoustic claims.
-
-**Panel plan:**
-
-- Thermal voltage/power trace with state windows.
-- AE hit density or energy trace with same windows.
-- Image-folder state labels aligned to voltage windows.
-
-**Status:** Needed before making lead/lag claims.
+Source: `outputs/aug9_model_analysis/Graphical_Abstract.pdf`.

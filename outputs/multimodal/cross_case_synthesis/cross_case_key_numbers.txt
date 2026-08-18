@@ -1,3 +1,84 @@
+AE window quality
+  blocked: 4
+  caution: 32
+  blocked states: 5gs_22C/37.5, 5gs_22C/47.5, 10gs_22C/35V, 15gs_20C/52.5
+
+Cross-case trend summary
+  5gs_22C: rho(q'', alpha_A)=0.89, rho(q'', L_A)=0.99, rho(alpha_A, AE) nonblocked=0.76
+  10gs_22C: rho(q'', alpha_A)=0.57, rho(q'', L_A)=0.89, rho(alpha_A, AE) nonblocked=0.66
+  15gs_20C: rho(q'', alpha_A)=0.85, rho(q'', L_A)=0.97, rho(alpha_A, AE) nonblocked=0.12
+  25gs_20C: rho(q'', alpha_A)=0.81, rho(q'', L_A)=0.93, rho(alpha_A, AE) nonblocked=0.71
+
+Leave-one-state-out trend sensitivity
+  5gs_22C: baseline rho=0.76, without 25 rho=0.85, max |delta|=0.09
+  10gs_22C: baseline rho=0.66, without 30V rho=0.60, max |delta|=0.06
+  15gs_20C: baseline rho=0.12, without 55 CHF rho=0.68, max |delta|=0.56
+  25gs_20C: baseline rho=0.71, without 45 rho=0.93, max |delta|=0.21
+
+Frame-sampling uncertainty
+  states with sampling warnings: 29
+  states with vapor relative 95% CI half-width > 0.25: 4
+  largest vapor 95% CI half-width: 25gs_20C/35, relative=0.38, absolute=0.043
+
+Thermal response checks
+  10gs_22C: status=state_level_supported; rho(voltage, q'')=1.00; rho(q'', HTC)=0.89; q''=6.51 to 36.23 W/cm2
+  15gs_20C: status=state_level_supported; rho(voltage, q'')=1.00; rho(q'', HTC)=0.88; q''=7.55 to 36.30 W/cm2
+  25gs_20C: status=state_level_supported; rho(voltage, q'')=1.00; rho(q'', HTC)=0.83; q''=10.84 to 41.76 W/cm2
+  5gs_22C: status=state_level_supported; rho(voltage, q'')=1.00; rho(q'', HTC)=0.85; q''=7.54 to 32.42 W/cm2
+
+Segmentation validation plan
+  validation targets: 16 states across 4 cases
+  statuses: planned_not_complete=16
+  10gs_22C/25V: roles=onset_or_low_vapor; minimum_masks=8; status=planned_not_complete
+  10gs_22C/30V: roles=highest_sampling_uncertainty; minimum_masks=8; status=planned_not_complete
+  10gs_22C/40V: roles=developed_mid_sweep; minimum_masks=8; status=planned_not_complete
+  10gs_22C/52.5V: roles=high_vapor_or_chf_adjacent; minimum_masks=8; status=planned_not_complete
+  15gs_20C/25_ONSET: roles=onset_or_low_vapor; minimum_masks=8; status=planned_not_complete
+  15gs_20C/40: roles=highest_sampling_uncertainty; minimum_masks=8; status=planned_not_complete
+  15gs_20C/45: roles=developed_mid_sweep; minimum_masks=8; status=planned_not_complete
+  15gs_20C/55 CHF: roles=high_vapor_or_chf_adjacent; minimum_masks=8; status=planned_not_complete
+  25gs_20C/30_Onset: roles=onset_or_low_vapor; minimum_masks=8; status=planned_not_complete
+  25gs_20C/35: roles=highest_sampling_uncertainty; minimum_masks=8; status=planned_not_complete
+  25gs_20C/45: roles=developed_mid_sweep; minimum_masks=8; status=planned_not_complete
+  25gs_20C/57.5: roles=high_vapor_or_chf_adjacent; minimum_masks=8; status=planned_not_complete
+  5gs_22C/25: roles=onset_or_low_vapor; minimum_masks=8; status=planned_not_complete
+  5gs_22C/27.5: roles=highest_sampling_uncertainty; minimum_masks=8; status=planned_not_complete
+  5gs_22C/40: roles=developed_mid_sweep; minimum_masks=8; status=planned_not_complete
+  5gs_22C/52CHF: roles=high_vapor_or_chf_adjacent; minimum_masks=8; status=planned_not_complete
+
+AE verification status
+  10gs_22C: trigger_verified=False; sensor_coupling_verified=False; source=not_provided
+  15gs_20C: trigger_verified=False; sensor_coupling_verified=False; source=not_provided
+  25gs_20C: trigger_verified=False; sensor_coupling_verified=False; source=not_provided
+  5gs_22C: trigger_verified=False; sensor_coupling_verified=False; source=not_provided
+
+AE evidence tiers
+  10gs_22C: blocked_mixed_window_snapshot; state-matched screening only; exclude blocked windows from AE correlations; limits=overlap_blocked_windows;no_pass_quality_windows;trigger_synchronization_unverified;sensor_coupling_unverified
+  15gs_20C: blocked_mixed_window_snapshot; state-matched screening only; exclude blocked windows from AE correlations; limits=overlap_blocked_windows;no_pass_quality_windows;state_sensitive_vapor_ae_rank;trigger_synchronization_unverified;sensor_coupling_unverified
+  25gs_20C: exploratory_legacy_window_snapshot; state-matched exploratory comparison only; limits=no_pass_quality_windows;trigger_synchronization_unverified;sensor_coupling_unverified
+  5gs_22C: blocked_mixed_window_snapshot; state-matched screening only; exclude blocked windows from AE correlations; limits=overlap_blocked_windows;no_pass_quality_windows;trigger_synchronization_unverified;sensor_coupling_unverified
+
+AE readiness matrix
+  10gs_22C: status=blocked_for_quantitative_use; quantitative_ready=False; pass_fraction=0.00; nonblocked=6/7; limits=insufficient_pass_quality_windows;overlap_blocked_windows;missing_contiguous_window_metadata;trigger_synchronization_unverified;sensor_coupling_unverified
+  15gs_20C: status=blocked_for_quantitative_use; quantitative_ready=False; pass_fraction=0.00; nonblocked=8/9; limits=insufficient_pass_quality_windows;overlap_blocked_windows;missing_contiguous_window_metadata;trigger_synchronization_unverified;sensor_coupling_unverified;state_sensitive_vapor_ae_rank
+  25gs_20C: status=legacy_screening_only; quantitative_ready=False; pass_fraction=0.00; nonblocked=8/8; limits=insufficient_pass_quality_windows;missing_contiguous_window_metadata;trigger_synchronization_unverified;sensor_coupling_unverified
+  5gs_22C: status=blocked_for_quantitative_use; quantitative_ready=False; pass_fraction=0.00; nonblocked=10/12; limits=insufficient_pass_quality_windows;overlap_blocked_windows;missing_contiguous_window_metadata;trigger_synchronization_unverified;sensor_coupling_unverified
+
+AE remediation plan
+  P1 10gs_22C: rerun per-case analysis with contiguous-window selection and remove or replace remaining overlap-blocked AE windows; blocked=35V; long=30V; verify=attach acquisition trigger or shared-timebase evidence;audit AE sensor mounting/coupling for both channels
+  P1 15gs_20C: rerun per-case analysis with contiguous-window selection and remove or replace remaining overlap-blocked AE windows; blocked=52.5; long=50; verify=attach acquisition trigger or shared-timebase evidence;audit AE sensor mounting/coupling for both channels;inspect waveform and matching window for influential state 55 CHF
+  P1 5gs_22C: rerun per-case analysis with contiguous-window selection and remove or replace remaining overlap-blocked AE windows; blocked=37.5;47.5; long=35;45; verify=attach acquisition trigger or shared-timebase evidence;audit AE sensor mounting/coupling for both channels
+  P2 25gs_20C: rerun per-case analysis so thermal_window_selection provenance is present for every state; blocked=none; long=none; verify=attach acquisition trigger or shared-timebase evidence;audit AE sensor mounting/coupling for both channels
+
+Claim-evidence matrix
+  optical_heat_flux_trend: supported_with_limits; scope=State-level, projected 2D vapor-occupation trend in the current ROI and operating-state snapshot.; limits=29 sampling-warning states; largest relative 95% CI 0.38 at 25gs_20C/35; projected area is not volumetric void fraction; manual segmentation validation remains incomplete.
+  active_length_heat_flux_trend: supported_with_limits; scope=State-level active-length metric using phi_thr=0.05 within the current ROI.; limits=Active length depends on the stated phi_thr=0.05 criterion and camera ROI.
+  state_level_thermal_response: supported_with_limits; scope=State-level reduced-thermal context from voltage-matched workbook rows; not local optical-thermal registration.; limits=mean_htc_averaged_over_seven_positions;heat_loss_and_thermocouple_uncertainty_not_propagated;camera_to_thermocouple_registration_missing
+  ae_screening_comparison: screening_only; scope=State-matched, quality-tagged AE screening comparison; exclude blocked windows from quantitative AE correlations.; limits=overlap_blocked_windows;no_pass_quality_windows;trigger_synchronization_unverified;sensor_coupling_unverified;state_sensitive_vapor_ae_rank;insufficient_pass_quality_windows;missing_contiguous_window_metadata
+  ae_regime_classifier_or_lead_lag: not_supported_current_snapshot; scope=Do not make quantitative AE regime-classifier, timing, or lead-lag claims.; limits=trigger_synchronization_unverified; sensor_coupling_unverified; legacy_no_contiguous_window_metadata
+  bubble_instance_statistics: not_supported_current_snapshot; scope=Limit image claims to projected vapor coverage and active streamwise length.; limits=manual_segmentation_validation_missing; dense-vapor instance separation uncertain; archived_detectron2_eval_metrics_missing
+  local_optical_thermal_coupling: not_supported_current_snapshot; scope=Use global state-level optical/thermal comparisons only.; limits=camera_registration_missing; thermal_uncertainty_audit_missing
+
 5gs_22C
   heat flux range: 7.54 to 32.42 W/cm2
   vapor area fraction range: 0.040 to 0.348

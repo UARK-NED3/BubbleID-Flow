@@ -1,0 +1,5 @@
+cross_validation,model,states,rmse_c,mae_c,prediction_correlation
+leave-one-state-out,thermal baseline,36,4.839637218743683,2.895820505167962,0.9084869885202342
+leave-one-state-out,thermal baseline + projected area,36,5.566781976059342,3.1132209820136256,0.8770684110922172
+leave-one-case-out,thermal baseline,36,6.537547495833972,5.451291247489897,0.8327379348190102
+leave-one-case-out,thermal baseline + projected area,36,6.922505353397647,5.491671924891885,0.8081130718810627

@@ -44,6 +44,12 @@ BubbleID-Flow currently provides:
 - Binary bubble masks and overlays.
 - Projected vapor area fraction profiles along the flow direction.
 
+The current manuscript figures use the external Mask R-CNN model folder:
+
+```text
+C:\Users\hanhu\Box\NED3_Share\0_BubbleID\BubbleID-Flow\detectron2_flow_mrcnn_roi485_70
+```
+
 Candidate image-derived metrics:
 
 - projected vapor area fraction, global and streamwise-resolved
@@ -126,6 +132,12 @@ Candidate acoustic metrics:
 - broadband spectral energy in physically meaningful frequency bands
 - AE intermittency and burst statistics
 - channel-to-channel delay or amplitude ratio if synchronization supports it
+
+Preliminary acoustic and thermal analysis products are under:
+
+```text
+C:\Users\hanhu\Box\NED3_Share\0_NSF_CASIS_FBCE_Project\CWRU_visit_Oct_13_17_2025
+```
 
 ## Integration Strategy
 
@@ -243,5 +255,7 @@ Candidate acoustic metrics:
 - Camera pixel-to-length calibration and field-of-view location relative to thermocouple
   positions.
 - AE sensor channel placement and coupling quality for each test.
+- AE sensor coupling/mounting adequacy, because Test 17 notes flag that
+  mounting may have been inadequate.
 - Thermal uncertainty, heat-loss correction, and whether existing calculated quantities should
   be independently audited before publication.

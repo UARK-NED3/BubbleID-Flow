@@ -1,0 +1,56 @@
+{
+  "bootstrap": {
+    "confidence_level": 0.95,
+    "interval_method": "image-level percentile bootstrap",
+    "metrics": {
+      "mean_absolute_area_fraction_error": {
+        "ci95_high": 0.006605251438015109,
+        "ci95_low": 0.003696973192822803,
+        "estimate": 0.005084563873626374
+      },
+      "mean_signed_area_fraction_error": {
+        "ci95_high": 0.004244344522664835,
+        "ci95_low": -0.0003616634830013737,
+        "estimate": 0.0020711710164835165
+      },
+      "mean_union_mask_dice": {
+        "ci95_high": 0.8298800115216564,
+        "ci95_low": 0.6899066193076763,
+        "estimate": 0.7686273342456947
+      },
+      "mean_union_mask_iou": {
+        "ci95_high": 0.721032964614776,
+        "ci95_low": 0.573426507511495,
+        "estimate": 0.6519535929347987
+      }
+    },
+    "samples": 10000,
+    "seed": 20260812
+  },
+  "interpretation": {
+    "not_supported": "experiment-held-out generalization or individual-bubble statistics",
+    "supported": "internal same-sequence reconstruction of projected vapor area"
+  },
+  "operating_point": {
+    "detection_cap": 300,
+    "images": 26,
+    "max_absolute_area_fraction_error": 0.01605747767857143,
+    "max_predicted_instances": 203,
+    "mean_absolute_area_fraction_error": 0.005084563873626374,
+    "mean_signed_area_fraction_error": 0.0020711710164835165,
+    "mean_union_mask_dice": 0.7686273342456947,
+    "mean_union_mask_iou": 0.6519535929347987,
+    "median_union_mask_iou": 0.7069361246772549,
+    "score_threshold": 0.3
+  },
+  "split_audit": {
+    "distinct_camera_prefixes": 1,
+    "holdout_images": 26,
+    "holdout_with_same_nominal_frame_in_training": 10,
+    "holdout_with_training_frame_within_one_index": 25,
+    "median_nearest_training_frame_distance": 1.0,
+    "median_nearest_training_image_correlation": 0.9494146626134358,
+    "split_classification": "same-sequence internal holdout",
+    "train_images": 104
+  }
+}

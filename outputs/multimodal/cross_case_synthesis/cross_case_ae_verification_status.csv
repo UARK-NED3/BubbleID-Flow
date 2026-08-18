@@ -1,0 +1,5 @@
+case_label,trigger_synchronization_verified,sensor_coupling_verified,verification_source,verification_notes
+10gs_22C,False,False,not_provided,No case-level trigger or sensor-coupling verification record supplied.
+15gs_20C,False,False,not_provided,No case-level trigger or sensor-coupling verification record supplied.
+25gs_20C,False,False,not_provided,No case-level trigger or sensor-coupling verification record supplied.
+5gs_22C,False,False,not_provided,No case-level trigger or sensor-coupling verification record supplied.

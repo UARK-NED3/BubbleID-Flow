@@ -25,6 +25,12 @@ def main() -> None:
     parser.add_argument("--roi", required=True, help="Crop as x,y,width,height.")
     parser.add_argument("--bins", type=int, default=64)
     parser.add_argument("--score-threshold", type=float, default=0.3)
+    parser.add_argument(
+        "--detections-per-image",
+        type=int,
+        default=None,
+        help="Optional Detectron2 TEST.DETECTIONS_PER_IMAGE override.",
+    )
     parser.add_argument("--pixel-size-mm", type=float, default=None)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     args = parser.parse_args()
@@ -39,7 +45,9 @@ def main() -> None:
 
     roi = parse_roi(args.roi)
     cropped = crop_array(image, roi)
-    predictor = DefaultPredictor(_build_cfg(args.weights, args.score_threshold, args.device))
+    predictor = DefaultPredictor(
+        _build_cfg(args.weights, args.score_threshold, args.device, args.detections_per_image)
+    )
     outputs = predictor(cropped)
     instances = outputs["instances"].to("cpu")
     masks = instances.pred_masks.numpy() if instances.has("pred_masks") else np.empty((0, *cropped.shape[:2]))
@@ -70,7 +78,7 @@ def main() -> None:
     print(f"Mean projected vapor area fraction: {profile['projected_vapor_area_fraction'].mean():.4f}")
 
 
-def _build_cfg(weights: str, score_threshold: float, device: str):
+def _build_cfg(weights: str, score_threshold: float, device: str, detections_per_image: int | None):
     cfg = get_cfg()
     cfg.merge_from_file(
         model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml")
@@ -82,6 +90,10 @@ def _build_cfg(weights: str, score_threshold: float, device: str):
     cfg.MODEL.ANCHOR_GENERATOR.SIZES = [[8], [16], [32], [64], [128]]
     cfg.INPUT.MIN_SIZE_TEST = 640
     cfg.INPUT.MAX_SIZE_TEST = 900
+    if detections_per_image is not None:
+        if detections_per_image <= 0:
+            raise ValueError("detections_per_image must be positive")
+        cfg.TEST.DETECTIONS_PER_IMAGE = detections_per_image
     return cfg
 
 

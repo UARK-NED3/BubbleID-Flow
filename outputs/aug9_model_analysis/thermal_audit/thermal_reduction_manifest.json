@@ -1,0 +1,16 @@
+{
+  "channel_width_m": 0.0025,
+  "channel_height_m": 0.005,
+  "heated_length_m": 0.1146,
+  "flow_area_m2": 1.25e-05,
+  "heated_area_m2": 0.00028649999999999997,
+  "hydraulic_diameter_m": 0.0033333333333333335,
+  "heat_flux_equation": "q_double_prime=P/(heated_length*channel_width)",
+  "mass_flux_equation": "G=m_dot/(channel_width*channel_height)",
+  "uncertainty_scope": "reported standard deviations quantify within-window temporal variation only; instrument calibration uncertainties were not supplied",
+  "excluded_from_validation": [
+    "Qsp energy balance because its source notebook multiplies m_dot*cp*abs(Tout-Tin) by an undocumented 0.53",
+    "friction-factor outputs because source mass velocity uses g/s without conversion to kg/s",
+    "supplied HTC as a validated endpoint because thermocouple placement/corrections and sensor uncertainty are not documented"
+  ]
+}

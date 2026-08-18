@@ -1,0 +1,23 @@
+{
+  "thermal_response": "mean of seven measured test-section surface temperatures",
+  "baseline_predictors": [
+    "heat_flux_mean_w_cm2",
+    "mass_flux_kg_m2_s",
+    "inlet_subcooling_mean_c"
+  ],
+  "augmented_predictors": [
+    "heat_flux_mean_w_cm2",
+    "mass_flux_kg_m2_s",
+    "inlet_subcooling_mean_c",
+    "vapor_area_fraction_aug9"
+  ],
+  "model": "standardized ridge regression with fixed alpha=1.0",
+  "cross_validation": [
+    "leave-one-state-out",
+    "leave-one-case-out"
+  ],
+  "states_with_complete_optical_thermal_data": 36,
+  "missing_thermal_state": "10gs_22C/45V",
+  "residual_pearson_correlation_after_baseline_linear_adjustment": -0.2802775342916848,
+  "interpretation": "screening test of incremental state-level association; not a causal or deployment model"
+}
