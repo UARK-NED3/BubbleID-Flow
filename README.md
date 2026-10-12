@@ -2,6 +2,9 @@
 
 Adaptation workspace for segmenting bubbles in flow boiling images.
 
+Repository scope, evidence, and reuse boundaries are also available in the
+[NED3 resource manifest](.ned3/resource-manifest-v0.1.json).
+
 ## Purpose
 
 BubbleID was developed for pool boiling imagery. This repository keeps the first goal simple:
