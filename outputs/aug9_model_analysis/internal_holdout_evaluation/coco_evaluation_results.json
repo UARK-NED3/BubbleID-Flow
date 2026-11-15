@@ -1,0 +1,28 @@
+{
+  "bbox": {
+    "AP": 23.414126786063612,
+    "AP50": 51.60284775776921,
+    "AP75": 18.415070611206232,
+    "APl": NaN,
+    "APm": 44.948936799944484,
+    "APs": 23.033689060725532
+  },
+  "coverage": {
+    "images": 26,
+    "max_absolute_area_fraction_error": 0.016057477678571408,
+    "max_predicted_instances": 203,
+    "mean_absolute_area_fraction_error": 0.005084563873626374,
+    "mean_signed_area_fraction_error": 0.0020711710164835165,
+    "mean_union_mask_dice": 0.7686273342456947,
+    "mean_union_mask_iou": 0.6519535929347987,
+    "median_union_mask_iou": 0.7069361246772549
+  },
+  "segm": {
+    "AP": 24.88090220435028,
+    "AP50": 52.099926160082354,
+    "AP75": 20.228828167726085,
+    "APl": NaN,
+    "APm": 50.11855819882235,
+    "APs": 24.454238907352078
+  }
+}

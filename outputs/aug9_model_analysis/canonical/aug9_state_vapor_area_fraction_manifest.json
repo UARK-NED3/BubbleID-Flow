@@ -1,0 +1,14 @@
+{
+  "case_count": 4,
+  "checkpoint": "model_final.pth",
+  "checkpoint_sha256": "6F60969CE876F57A78B53FC61895C99B92CB2E1B6F0E0B30F01FA301236042CD",
+  "detections_per_image": 300,
+  "direct_inference_check": "The separately archived 45 V sequence analysis provides direct checkpoint inference for four states.",
+  "roi": "0,485,1024,70",
+  "score_threshold": 0.3,
+  "state_count": 37,
+  "state_table": "aug9_state_vapor_area_fraction.csv",
+  "state_value_status": "Archived August state table. It is linked to the released checkpoint by the documented manuscript configuration, but this export does not claim a fresh full-state inference.",
+  "values_workbook": "values_vf_bc.xlsx",
+  "values_workbook_sha256": "F440DBD557C790D6133E38B020A5F0CFE774B6D42616A1BB6EB3182351235E0C"
+}

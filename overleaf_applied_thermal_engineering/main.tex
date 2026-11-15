@@ -1,0 +1,285 @@
+\documentclass[preprint,12pt,sort&compress]{elsarticle}
+
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{lineno}
+\usepackage{seqsplit}
+\usepackage{url}
+
+\journal{Applied Thermal Engineering}
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{BubbleID-Flow: Machine-Vision Quantification of Vapor Area Fraction in Subcooled Flow Boiling}
+
+\author[uark]{Md Abrar Hoq Fahim}
+\author[cwru]{Farshad Barghi Golezani}
+\author[uark]{Daniel Curl}
+\author[uark]{Mohammad Ishraq Hossain}
+\author[uark]{Stephen Pierson}
+\author[cwru]{Sruthi S. Pydimarry}
+\author[cwru]{Chirag Kharangate}
+\author[uark]{Han Hu\corref{cor1}}
+\cortext[cor1]{Corresponding author.}
+\ead{hanhu@uark.edu}
+
+\address[uark]{Department of Mechanical Engineering, University of Arkansas, Fayetteville, AR, USA}
+\address[cwru]{Department of Mechanical and Aerospace Engineering, Case Western Reserve University, Cleveland, OH, USA}
+
+\begin{abstract}
+High-speed visualization can reveal liquid--vapor structures that influence flow-boiling heat transfer, yet overlapping vapor regions and serially correlated image sequences make large image sets difficult to convert into a defensible phase metric. This work presents BubbleID-Flow, an open workflow that uses an archived fine-tuned Mask R-CNN checkpoint to quantify near-wall vapor area fraction from high-speed FC-72 images and relate that image-plane metric to available thermal records. Against fixed Otsu morphology and a learned pixel-intensity baseline, the checkpoint gave the most accurate union-mask reconstruction on a manually annotated same-sequence holdout. Complete-sequence analysis showed that adjacent high-speed frames cannot be treated as independent observations. Vapor area fraction increased with heat flux within the imposed ramps, but it did not improve cross-validated surface-temperature prediction beyond heat flux, mass flux, and inlet subcooling. The contribution is a traceable, released measurement workflow for a bounded image-domain endpoint rather than a validated void-fraction or bubble-dynamics method. Independent experiments, calibrated imaging, and spatial optical--thermal registration are required to establish generalization and broader two-phase-flow interpretation.
+\end{abstract}
+
+\begin{keyword}
+Flow boiling \sep Computer vision \sep Vapor area fraction \sep Mask R-CNN \sep FC-72 \sep Temporal uncertainty
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
+
+\section{Introduction}
+
+Flow boiling supports high heat removal in compact thermal systems, but its performance depends on mass flux, inlet subcooling, channel geometry, heating configuration, and the evolving liquid--vapor structure \cite{Mudawar2001,Mudawar2011,Kharangate2015,Shingote2024}. High-speed visualization is therefore used with thermal measurements to examine bubble growth, detachment, coalescence, flow-pattern evolution, and wall rewetting. Early digital-image studies combined parallel and normal views to quantify bubble characteristics and local vapor content \cite{Maurus2002}. Later work used image processing in microchannels and annular passages to map flow patterns and estimate void fraction over heat flux, mass flux, and axial position \cite{Singh2009,Rana2014,Placzkowski2021Photographic,Li2021Visualization,Puli2012VoidFraction}. These studies establish optical imaging as a valuable diagnostic, but they also show that the reported quantity is inseparable from the viewing geometry, calibration, and image-processing assumptions.
+
+The distinction is consequential for phase metrics. Cross-sectional or calibrated multi-view measurements can support a void-fraction interpretation when the vapor volume is related to the imaged channel volume \cite{Maurus2002,Chu2021}. A single near-wall view instead yields an image-plane measure of the region classified as vapor. Vapor area fraction, dry-patch coverage, bubble footprint, and volumetric void fraction should not be treated as interchangeable. They respond differently to confinement, depth of field, and three-dimensional vapor topology. The present work uses ``vapor area fraction'' only for the union-mask area normalized by a fixed near-wall region of interest.
+
+Classical image-processing pipelines use thresholding, edge detection, contour filling, and morphology to separate vapor from liquid. They can be effective in controlled imaging, but their parameters are sensitive to illumination, surface texture, blurred interfaces, and overlapping bubbles \cite{Chu2021,Schepperle2024FlowRegimes}. Deep-learning segmentation reduces reliance on hand-tuned thresholds while making annotation quality, training domain, and validation design part of the measurement chain. Fully convolutional networks have been used for flow-boiling void-fraction estimation \cite{Chu2021}. U-Net transfer learning has supported segmentation and optical-flow analysis of subcooled-flow-boiling bubbles \cite{Seong2023Automated}, and computer-vision workflows have jointly estimated flow regime and image-derived void fraction \cite{Schepperle2024FlowRegimes}. Related boiling studies show that semantic masks can recover vapor regions in images with merged boundaries \cite{Soibam2023Segmentation,Malakhov2023DeepLearning}. Instance-segmentation and tracking frameworks seek the additional information needed for bubble count, size, aspect ratio, wetting-front length, interfacial length, and trajectories \cite{Chang2023BubbleMask,Suh2024VISIONiT,Dunlap2024BubbleID,Moiz2025BubbleDynamics}. Those downstream quantities require more than a good foreground mask. They require validated instance separation, spatial calibration, and temporal linking for dynamic quantities.
+
+AI has also been used to connect visual features with boiling performance, including heat-flux estimation, CHF-oriented analysis, and image-informed thermal prediction \cite{Chang2023BubbleMask,Huang2024BoilingPrediction,Comelli2024Image,Na2025Thermal,Naderi2026LargeScale}. Reviews of AI in gas--liquid two-phase flow distinguish image analysis from related tasks such as flow-pattern classification and prediction of pressure drop or void fraction \cite{Miwa2022TwoPhaseVision,Qiu2025MLReview}. A predictive model can exploit image-derived information, but its apparent value depends on the operating design and whether changes in heat input, flow condition, and vapor structure can be separated. The present work addresses the complementary measurement problem. It defines and evaluates an image-plane vapor-area-fraction measurement from union masks produced by an archived fine-tuned instance-segmentation checkpoint. It compares the result with two baselines, accounts for serial correlation in sequence means, and tests whether the optical metric adds information beyond available thermal-control variables. The public release includes the images, annotations, checkpoint, thermal records, and analysis code. BubbleID-Flow is an open workflow for a bounded measurement task. It does not claim volumetric void fraction, independently generalizable segmentation, or universally transferable bubble-dynamics statistics.
+
+\section{Experimental data}
+
+\subsection{Flow loop and test section}
+
+The data were collected in a laboratory FC-72 flow-boiling experiment. The rectangular flow passage was 2.5 mm wide and 5.0 mm high, giving a cross-sectional area of $1.25\times10^{-5}$ m$^2$ and a hydraulic diameter of 3.33 mm. The bottom wall was electrically heated over a length of 114.6 mm, corresponding to a nominal heated area of $2.865\times10^{-4}$ m$^2$. Seven test-section surface-temperature locations were recorded at
+\[
+x=[0.0054,0.0227,0.0400,0.0573,0.0746,0.0919,0.1092]\ \mathrm{m}
+\]
+from the upstream end of the heated length. Figure~\ref{fig:facility} provides photographic views of the flow-boiling facility, including the high-speed imaging arrangement and heated test section used for the present optical--thermal analysis.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Figure_1_facility_data_streams.png}
+  \caption{Photographic views of the experimental flow-boiling facility. (a) Overall view identifying the high-speed camera, flow-rate sensor, and electrically heated test section. (b) Test-section view showing the heated flow passage and the optical observation location. The acoustic-emission sensors visible in (b) are facility hardware; their records are outside the present optical--thermal analysis.}
+  \label{fig:facility}
+\end{figure}
+
+The four image cases have nominal mass flow rates of 5, 10, 15, and 25 g/s and nominal inlet subcoolings of 22, 22, 20, and 20 $^\circ$C, respectively. With the measured flow area, the matched thermal records give mean mass fluxes of approximately 395--443, 781--824, 1189--1209, and 1994--2010 kg /(m$^2$ s). Across the matched states, heat flux spans 6.51--41.76 W/cm$^2$. Table~\ref{tab:test-matrix} identifies the available optical and thermal states.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Operating cases and matched optical--thermal state coverage. One 10 g/s optical state has no thermal row within the matching tolerance.}
+  \label{tab:test-matrix}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Case & $\dot m$ (g/s) & $G$ (kg /(m$^2$ s)) & Optical states & Matched states \\
+    \midrule
+    \texttt{5gs\_22C}  & 5  & 395--443   & 12 & 12 \\
+    \texttt{10gs\_22C} & 10 & 781--824   & 8  & 7 \\
+    \texttt{15gs\_20C} & 15 & 1189--1209 & 9  & 9 \\
+    \texttt{25gs\_20C} & 25 & 1994--2010 & 8  & 8 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Some operating records carry onset or CHF labels. Because the available test information does not define an objective onset, wall-dryout, or critical-heat-flux criterion, these labels are not used to identify physical transitions in this study.
+
+\subsection{Optical and thermal records}
+
+A FASTCAM SA-Z recorded 1024 by 1024 pixel images at 3000 frames/s. The model analyzes a fixed 1024 by 70 pixel near-wall region of interest (ROI) starting at image coordinate $(0,485)$. The pixel-to-length calibration and spatial registration between the ROI, heated surface, and seven temperature locations were not supplied. Accordingly, this paper reports neither dimensional bubble size nor local optical--thermal coupling.
+
+The thermal records contain time, mass flow, voltage, electrical power, inlet subcooling, inlet and outlet temperature, pressure, and seven test-section surface-temperature streams. Instrument model numbers, calibration records, heat-loss characterization, and sensor uncertainty were not available. Scatter within a selected time window is consequently reported as temporal variability, not as measurement uncertainty.
+
+\section{Methods}
+
+\subsection{Annotation, fine-tuning, and inference}
+
+The annotation dataset contains 130 images and 130 Labelme JSON files. The original schema distinguishes \texttt{bubble} from \texttt{bubble\_cluster}, but both labels are mapped to one vapor-region category for the present analysis. Thus, the union-mask output supports vapor-area-fraction measurement, not a morphology-resolved bubble taxonomy. Every fifth sorted image was assigned to the holdout, giving 104 training images with 7273 retained ROI annotations and 26 holdout images with 1908 annotations. The annotations are converted to the one-class COCO (Common Objects in Context) JSON format, which records image, category, and polygon-mask data for detection software. Figure~\ref{fig:dataset-pipeline} summarizes this preparation.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Figure_2_dataset_preparation_pipeline.png}
+  \caption{Dataset preparation workflow. High-speed flow-boiling images are manually annotated in Labelme, cropped to the near-wall region of interest, and partitioned into one-class COCO training and same-sequence holdout sets. The right-hand subset in the diagram is designated a same-sequence holdout rather than an independent validation set and is used only to evaluate reconstruction within the source sequence.}
+  \label{fig:dataset-pipeline}
+\end{figure}
+
+The archived Detectron2 Mask R-CNN model used a ResNet-50 feature-pyramid backbone \cite{He2017MaskRCNN,Wu2019Detectron2}. Mask R-CNN is an instance-segmentation model that assigns a class, bounding box, and pixel mask to each detected vapor region. The repository reconstruction path initializes this architecture from the standard COCO-pretrained Mask R-CNN checkpoint, whereas the available archived configuration specifies 2000 iterations, evaluation every 500 iterations, one image per batch, a base learning rate of $2.5\times10^{-4}$, and anchor sizes of 8, 16, 32, 64, and 128 pixels. For this study, retained instance masks are combined into one union mask before calculating vapor area fraction. The original training log, seed, augmentation trace, and checkpoint-selection record were not supplied. This study therefore evaluates the archived checkpoint but does not claim to reproduce fine-tuning.
+
+The selected inference settings use a score threshold of 0.30 and at most 300 detections per image. All retained instance masks are combined before calculating vapor area fraction,
+\begin{equation}
+\alpha_A=\frac{N_{\mathrm{vapor}}}{N_{\mathrm{ROI}}},
+\label{eq:coverage}
+\end{equation}
+where $N_{\mathrm{vapor}}$ is the number of pixels in the union mask and $N_{\mathrm{ROI}}$ is the ROI pixel count. Thus $\alpha_A$ reports the fraction of the fixed near-wall image region classified as vapor in the camera plane. It is not a volumetric vapor fraction, a void fraction, or a direct measure of liquid--wall contact.
+
+COCO-style average precision (AP) evaluates detected instances over specified intersection-over-union (IoU) criteria. It is distinct from the score threshold used to retain masks for a downstream engineering calculation. The engineering endpoint in Eq.~\eqref{eq:coverage} is evaluated at the selected 0.30 inference setting using union-mask IoU, Dice coefficient, signed vapor-area-fraction error, and absolute vapor-area-fraction error. For predicted and manual union masks $P_i$ and $M_i$ in holdout image $i$, the reported image-level metrics are
+\begin{equation}
+\mathrm{IoU}_i=\frac{|P_i\cap M_i|}{|P_i\cup M_i|},\qquad
+\mathrm{Dice}_i=\frac{2|P_i\cap M_i|}{|P_i|+|M_i|},
+\label{eq:segmentation_metrics}
+\end{equation}
+and the reported vapor-area-fraction errors are $\mathrm{MAE}_{\alpha_A}=n_h^{-1}\sum_{i=1}^{n_h}|\widehat{\alpha}_{A,i}-\alpha_{A,i}|$ and $\overline{\Delta\alpha_A}=n_h^{-1}\sum_{i=1}^{n_h}(\widehat{\alpha}_{A,i}-\alpha_{A,i})$, where $n_h=26$. A post hoc score-threshold sweep from 0.05 to 0.70 and detection-cap sweep from 50 to 300 assess sensitivity. They are not used as independent tuning evidence. Percentile intervals for image-level mean metrics use 10,000 deterministic bootstrap resamples. The split audit parses source-frame indices and computes nearest training--holdout proximity. Because all annotations derive from one source sequence, the holdout evaluates same-sequence reconstruction only.
+
+\subsection{Segmentation baselines}
+
+Two baselines test whether the deep model provides meaningful improvement. The fixed baseline applies grayscale Otsu thresholding followed by morphological cleanup, with no holdout tuning. The learned pixel baseline models vapor and background intensities with diagonal Gaussian likelihoods. The 104 non-holdout images are partitioned into 77 images for fitting the class distributions and 27 sequence-grouped images for calibrating the probability threshold. Neither baseline uses the 26-image holdout for parameter selection. The same union-mask metrics are then evaluated on the holdout for all three methods.
+
+\subsection{Temporal uncertainty}
+
+Every available frame is processed for one common electrical-input condition in each case. Serial dependence is summarized by the integrated autocorrelation time
+\begin{equation}
+\tau_{\mathrm{int}}=1+2\sum_{k=1}^{K}\rho_k,
+\qquad n_{\mathrm{eff}}=\frac{n}{\tau_{\mathrm{int}}},
+\label{eq:tau}
+\end{equation}
+where $\rho_k$ is the lag-$k$ autocorrelation, $K$ is the last retained lag in the initial positive sequence, and $n$ is the raw frame count. The sum stops at the first non-positive autocorrelation. Mean confidence intervals use a circular moving-block bootstrap with block length $\lceil\tau_{\mathrm{int}}\rceil$, 5000 resamples, and a fixed random seed \cite{Kunsch1989Bootstrap,Flyvbjerg1989Correlated}. Independent-frame Student-$t$ intervals are retained only as a diagnostic of underestimation.
+
+\subsection{Thermal data reduction}
+
+Only quantities recoverable from supplied measurements and documented geometry are used. Heat flux and mass flux are
+\begin{equation}
+q''=\frac{P_e}{W L_h}, \qquad G=\frac{\dot m}{W H},
+\label{eq:thermal}
+\end{equation}
+with $W=2.5$ mm, $H=5.0$ mm, and $L_h=114.6$ mm. Heat flux is calculated from measured electrical power and the documented heated area. For each operating state, contiguous thermal records within the prescribed electrical-input tolerance are identified and the longest non-overlapping interval is retained. State means and standard deviations are then calculated for power, heat flux, mass flow, inlet and outlet temperatures, and the seven surface-temperature streams. The analysis focuses on heat flux, mass flux, and temperature because the available records do not provide the calibration and heat-loss information required for a defensible uncertainty analysis of heat-transfer coefficient, vapor quality, friction factor, or energy balance.
+
+\subsection{Optical--thermal association test}
+
+Spearman correlations between $q''$ and $\alpha_A$ describe each voltage sweep. Because applied voltage and heat flux are monotonic together, these correlations do not isolate an optical effect. Incremental information is tested with ridge regression for the mean of the seven measured surface temperatures, $\overline{T}_s$. The thermal baseline uses standardized $q''$, $G$, and inlet subcooling. The augmented model adds $\alpha_A$. Ridge strength is fixed at 1.0. Performance is calculated by leave-one-state-out and the stricter leave-one-case-out cross-validation. All preprocessing is fit within each training fold.
+
+\section{Results and discussion}
+
+\subsection{Checkpoint reconstruction and baseline comparison}
+
+The same-sequence holdout gives bounding-box AP$_{50}=0.516$ and mask AP$_{50}=0.521$. AP averaged over IoU 0.50--0.95 is 0.234 for boxes and 0.249 for masks. At the selected 0.30 operating threshold, the combined masks give mean IoU 0.652, mean Dice 0.769, vapor-area-fraction MAE 0.0051, and mean signed error $+0.0021$. Bootstrap 95\% intervals are 0.573--0.721 for mean IoU, 0.690--0.830 for mean Dice, and 0.0037--0.0066 for vapor-area-fraction MAE. Figure~\ref{fig:model-outputs} shows representative near-wall images and their union-mask overlays across the four operating cases.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Figure_4_aug9_model_outputs.pdf}
+  \caption{Representative near-wall regions of interest at the common 45 V electrical-input condition for the four cases. (a) Raw images. (b) Corresponding union-mask overlays from the one-class Mask R-CNN model at a score threshold of 0.30 and a 300-detection cap.}
+  \label{fig:model-outputs}
+\end{figure}
+
+The error depends on vapor area fraction. Mean IoU is 0.444 for nine low-area-fraction images ($\alpha_A\leq0.05$), 0.758 for 13 intermediate images, and 0.775 for four high-area-fraction images. When the manual vapor mask occupies few pixels, even a small missed, boundary, or false-positive region changes overlap disproportionately. The low-area-fraction group has mean signed error $+0.0072$, whereas the high-area-fraction group has mean signed error $-0.0054$. Figure~\ref{fig:segmentation-robustness} shows that the score threshold giving the strongest overlap metrics differs from that giving the lowest vapor-area-fraction MAE. The selected operating point is therefore appropriate only for the specified vapor-area-fraction endpoint, not as a general optimum for instance segmentation.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.93\textwidth]{Figure_5_segmentation_robustness.pdf}
+  \caption{Same-sequence holdout sensitivity. (a) Predicted versus manual vapor area fraction. The dashed line indicates one-to-one agreement. (b) Union-mask IoU versus manual vapor area fraction. (c) Mean IoU and Dice over score thresholds. (d) Mean absolute error and absolute mean signed error over score thresholds. Dashed vertical lines mark the selected 0.30 operating setting. The sweep is post hoc sensitivity analysis, not independent model selection.}
+  \label{fig:segmentation-robustness}
+\end{figure}
+
+Table~\ref{tab:baselines} and Fig.~\ref{fig:baselines} show that Mask R-CNN substantially outperforms both baselines for vapor-area-fraction reconstruction. The table provides the exact values, while the figure makes the separation among methods directly visible. The Gaussian pixel classifier improves greatly over fixed Otsu morphology but still has 6.4 times the Mask R-CNN vapor-area-fraction MAE. This pattern is consistent with the learned model using spatial context that is unavailable to a pixel-intensity classifier, although the comparison does not isolate a unique causal model feature. The result supports the learned instance model for the stated union-mask endpoint, while the modest instance AP continues to preclude reliable bubble counts and sizes.
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \caption{Holdout segmentation comparison. The two baselines do not use holdout labels for parameter selection.}
+  \label{tab:baselines}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Method & Mean IoU & Mean Dice & \shortstack{Vapor-area\\fraction MAE} & \shortstack{Mean signed\\$\alpha_A$ error} \\
+    \midrule
+    Otsu morphology & 0.209 & 0.331 & 0.1891 & $+0.1891$ \\
+    Pixel Gaussian & 0.371 & 0.529 & 0.0327 & $+0.0258$ \\
+    Mask R-CNN & 0.652 & 0.769 & 0.0051 & $+0.0021$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.95\textwidth]{Figure_6_segmentation_baselines.pdf}
+  \caption{Segmentation-baseline comparison on the 26-image same-sequence holdout. (a) Mean union-mask IoU. (b) Mean union-mask Dice coefficient. (c) Vapor-area-fraction MAE. The Gaussian pixel classifier is fit and calibrated using training images only.}
+  \label{fig:baselines}
+\end{figure}
+
+The split audit places the aggregate metrics in context. Ten holdout images share a nominal source-frame index with a training image through filename variants, and 25 of 26 have a training image within one source-sequence index. The reported comparison therefore establishes a reconstruction baseline for this source sequence. It does not test transfer to a new experiment, imaging condition, working fluid, facility, or operating path.
+
+\subsection{State trends and autocorrelation-aware uncertainty}
+
+The 37-state optical summaries span $\alpha_A=0$--0.247. The 5 and 15 g/s sweeps increase to 0.247 and 0.190, respectively, over the tested electrical-input range. The 10 and 25 g/s sweeps reach 0.197 and 0.113 before decreasing at their highest recorded inputs. Because an objective CHF or dryout criterion was not available and most states do not have complete frame-level outputs, these decreases do not establish dryout or a universal transition threshold.
+
+The four complete sequences contain 88--108 frames. Frame-by-frame sequence means agree closely with the corresponding state summaries, with a four-case mean absolute difference of 0.00085. Table~\ref{tab:temporal} shows why treating frames as independent is inappropriate. Moving-block-bootstrap half-widths are 0.00103--0.00635, compared with 0.00044--0.00176 from Student-$t$ intervals.
+
+\begin{table}[htbp]
+  \centering
+  \caption{Autocorrelation-aware uncertainty for complete image sequences. CI denotes the 95\% moving-block-bootstrap interval.}
+  \label{tab:temporal}
+  \begin{tabular}{lrrrrr}
+    \toprule
+    Case & Frames & $\tau_{\mathrm{int}}$ & $n_{\mathrm{eff}}$ & Mean $\alpha_A$ & 95\% CI \\
+    \midrule
+    5 g/s  & 100 & 10.19 & 9.82 & 0.12897 & 0.12631--0.13190 \\
+    10 g/s & 108 & 9.64  & 11.20 & 0.10882 & 0.10514--0.11255 \\
+    15 g/s & 88  & 25.00 & 3.52 & 0.06556 & 0.05905--0.07175 \\
+    25 g/s & 95  & 9.84  & 9.66 & 0.01378 & 0.01274--0.01481 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Figure_5_aug9_optical_results.pdf}
+  \caption{Optical state and sequence results. (a) Vapor area fraction versus applied voltage. (b) Vapor area fraction versus matched heat flux. One 10 g/s optical state is omitted because no thermal window matched. (c) Vapor area fraction for every available frame in the four complete sequences. (d) Frame-sequence mean vapor area fraction versus the corresponding archived state-summary value. The dashed line indicates one-to-one agreement. Autocorrelation-aware numerical intervals are reported in Table~\ref{tab:temporal}.}
+  \label{fig:optical-results}
+\end{figure}
+
+Figure~\ref{fig:optical-results} first describes the state trends and then tests whether the available state summaries represent complete high-speed sequences. Vapor area fraction increases with input over most of the recorded ramps, whereas the highest recorded points at 10 and 25 g/s decrease without a verified regime-transition criterion. The frame traces are sequential observations of an evolving two-phase field and show persistent serial dependence rather than independent repeated observations. Their close agreement with the archived state summaries supports consistent processing of these records, but it is not independent model validation. The effective sample sizes show that adjacent high-speed frames do not provide the precision implied by their raw count.
+
+The scope of the reported metric is intentional. Union-mask vapor area fraction describes how much of the fixed image ROI is classified as vapor, whereas bubble count, equivalent diameter, aspect ratio, wetting-front length, and velocity require reliable instance separation, camera calibration, and temporal linking. The present holdout cannot validate those downstream quantities. Its images are from the same sequences used for training, its instances have low AP, and the optical ROI is not registered to the heated surface. The repository therefore retains the masks and frame-level outputs needed for subsequent spatial-coverage and interface analyses. It does not relabel vapor area fraction as volumetric vapor fraction or void fraction, or report unvalidated bubble-dynamics statistics.
+
+For three additional low-input states at 5 g/s, complete-sequence means differed from the state summaries by $-0.00115$ to $-0.00296$. These differences indicate that state summaries and complete-sequence means should not be treated as interchangeable. The additional states are therefore not combined with the cross-case trends.
+
+\subsection{Thermal association and incremental information}
+
+Within each voltage sweep, Spearman correlations between $q''$ and $\alpha_A$ are 1.000, 0.893, 1.000, and 0.929 for increasing nominal mass flow. However, voltage and $q''$ have $\rho_s=1.000$ in every case. The optical correlation is therefore inseparable from the imposed voltage progression in these data.
+
+The cross-validated temperature test reinforces this limitation. For leave-one-state-out validation, the thermal baseline gives RMSE 4.84 $^\circ$C and MAE 2.90 $^\circ$C. Adding $\alpha_A$ worsens them to 5.57 and 3.11 $^\circ$C. For leave-one-case-out validation, baseline RMSE and MAE are 6.54 and 5.45 $^\circ$C, compared with 6.92 and 5.49 $^\circ$C after adding vapor area fraction. Figure~\ref{fig:thermal-association} shows that surface temperature rises with heat flux, whereas its relation to vapor area fraction is not unique across mass-flow cases. The held-out errors do not improve when vapor area fraction is added. This result does not imply that interfacial structure is thermally irrelevant. It shows that this image-plane metric, sample size, and operating design do not demonstrate incremental predictive information beyond the three thermal-control variables.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=\textwidth]{Figure_7_optical_thermal_association.pdf}
+\caption{Thermal association and incremental-information test for 36 matched states. (a) Mean seven-sensor surface temperature versus heat flux. Error bars show the temporal standard deviation of the instantaneous seven-location average within each matched window. (b) Mean surface temperature versus vapor area fraction. (c) Cross-validated temperature RMSE for the thermal baseline and the baseline augmented with vapor area fraction. Gray bars show the thermal baseline and blue bars show the augmented model.}
+  \label{fig:thermal-association}
+\end{figure}
+
+\section{Conclusions}
+
+\begin{sloppypar}
+BubbleID-Flow provides an open machine-vision workflow for measuring two-dimensional vapor area fraction from high-speed subcooled flow-boiling images and connecting that image-plane metric with available thermal observations. The archived fine-tuned Mask R-CNN checkpoint reduced union-mask vapor-area-fraction error relative to fixed Otsu morphology and a learned Gaussian pixel baseline. Its same-sequence holdout performance supports the stated reconstruction task, not experiment-level generalization or individual-bubble statistics. Complete-sequence analysis also shows that temporal autocorrelation must be considered when reporting state means. Vapor area fraction covaried with heat flux within each imposed ramp, but it did not improve cross-validated surface-temperature prediction beyond heat flux, mass flux, and inlet subcooling. Calibrated imaging, experiment-held-out annotations, and spatial optical--thermal registration are the next requirements for a stronger thermal-physics interpretation.
+\end{sloppypar}
+
+\section*{CRediT authorship contribution statement}
+
+Md Abrar Hoq Fahim: Data curation, Software, Formal analysis, Visualization, Writing -- review and editing. Farshad Barghi Golezani: Methodology, Software, Visualization, Formal analysis, Writing -- review and editing. Daniel Curl: Investigation, Data curation, Methodology, Validation. Mohammad Ishraq Hossain: Investigation, Data curation, Formal analysis, Writing -- original draft. Sruthi S. Pydimarry: Investigation. Chirag Kharangate: Project administration, Writing -- review and editing. Han Hu: Conceptualization, Supervision, Funding acquisition, Project administration, Methodology, Writing -- review and editing.
+
+\section*{Declaration of competing interest}
+
+The authors declare that they have no known competing financial interests or personal relationships that could have appeared to influence the work reported in this paper.
+
+\section*{Funding}
+
+This work was supported by the National Science Foundation through Grant No. CBET-2323022.
+
+\section*{Data availability}
+
+\begin{sloppypar}
+Analysis code is available at \url{https://github.com/UARK-NED3/BubbleID-Flow}. The BubbleID-Flow dataset, including high-speed optical images, manual annotations, thermal workbooks, acoustic-emission records, and the fine-tuned Mask R-CNN checkpoint, is openly available through Zenodo at \url{https://doi.org/10.5281/zenodo.22235802}. The record includes release metadata and documentation for the available data streams and derived analysis products.
+\end{sloppypar}
+
+\section*{Declaration of generative AI and AI-assisted technologies in the manuscript preparation process}
+
+During preparation of this work, the authors used OpenAI Codex to assist with manuscript drafting, code organization, analysis scripts, and deterministic figure preparation. No generative image tool was used to create or alter the submitted scientific figures. The authors reviewed the resulting content and remain responsible for the manuscript.
+
+\bibliographystyle{elsarticle-num}
+{\small
+\bibliography{references}
+}
+
+\end{document}
