@@ -1,0 +1,18 @@
+{
+  "case": "10gs_22C",
+  "thermal_start_iso": "2025-10-17T11:41:47.605",
+  "ae_start_iso": "2025-10-17T11:42:13.000",
+  "ae_minus_thermal_start_s": 25.395,
+  "registration_status": "timestamp_registered_not_trigger_verified",
+  "allowed_interpretation": "exploratory state-level co-variation during the imposed voltage ramp",
+  "prohibited_interpretations": [
+    "sub-second optical-acoustic synchronization",
+    "causal coupling",
+    "acoustic source localization",
+    "calibrated acoustic energy",
+    "cross-case or experiment-level generalization"
+  ],
+  "wfs_prefix_records": 512,
+  "wfs_note": "bounded prefix is a decoding/spectral provenance check, not a state-matched waveform result",
+  "sensor_note": "archive notes report approximate sensor locations and inadequate mounting as a concern"
+}

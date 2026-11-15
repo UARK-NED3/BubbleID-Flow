@@ -1,0 +1,9 @@
+{
+  "split": "same-sequence internal holdout",
+  "fit_images": 77,
+  "calibration_images": 27,
+  "holdout_images": 26,
+  "calibration_grouping": "every fifth sorted source-sequence index from training only",
+  "selected_pixel_gaussian_threshold": 0.45000000000000007,
+  "selection_metric": "minimum calibration projected-area MAE, IoU tie-break"
+}

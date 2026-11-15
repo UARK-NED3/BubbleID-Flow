@@ -1,0 +1,8 @@
+state_label,state_voltage,time_start_s,time_end_s,ae_start_s,ae_end_s,registration_status,thermal_start_iso,ae_start_iso
+25V,25.0,236.0,245.9,210.605,220.505,timestamp_registered_not_trigger_verified,2025-10-17T11:41:47.605,2025-10-17T11:42:13.000
+30V,30.0,339.0,345.9,313.605,320.505,timestamp_registered_not_trigger_verified,2025-10-17T11:41:47.605,2025-10-17T11:42:13.000
+35V,35.0,421.0,426.9,395.605,401.505,timestamp_registered_not_trigger_verified,2025-10-17T11:41:47.605,2025-10-17T11:42:13.000
+40V,40.0,489.0,495.9,463.605,470.505,timestamp_registered_not_trigger_verified,2025-10-17T11:41:47.605,2025-10-17T11:42:13.000
+50V,50.0,630.0,637.9,604.605,612.505,timestamp_registered_not_trigger_verified,2025-10-17T11:41:47.605,2025-10-17T11:42:13.000
+52.5V,52.5,711.0,736.9,685.605,711.505,timestamp_registered_not_trigger_verified,2025-10-17T11:41:47.605,2025-10-17T11:42:13.000
+55V,55.0,762.0,767.9,736.605,742.505,timestamp_registered_not_trigger_verified,2025-10-17T11:41:47.605,2025-10-17T11:42:13.000

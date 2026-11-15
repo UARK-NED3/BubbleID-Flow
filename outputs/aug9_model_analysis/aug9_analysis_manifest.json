@@ -1,0 +1,31 @@
+{
+  "combined_summary": "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\outputs\\multimodal\\cross_case_synthesis\\combined_multimodal_state_summary.csv",
+  "combined_summary_sha256": "4C8687834827C9B92106182EF83C43E1022EC9BFFEB71892FD15C4D9E18B7557",
+  "detections_per_image": 300,
+  "frame_rate_hz": 3000.0,
+  "generated": [
+    "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\outputs\\aug9_model_analysis\\Figure_4_aug9_model_outputs.pdf",
+    "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\outputs\\aug9_model_analysis\\Figure_4_aug9_model_outputs.png",
+    "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\outputs\\aug9_model_analysis\\Figure_5_aug9_optical_results.pdf",
+    "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\outputs\\aug9_model_analysis\\Figure_5_aug9_optical_results.png",
+    "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\outputs\\aug9_model_analysis\\Figure_6_aug9_multimodal_context.pdf",
+    "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\outputs\\aug9_model_analysis\\Figure_6_aug9_multimodal_context.png",
+    "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\outputs\\aug9_model_analysis\\Graphical_Abstract.pdf",
+    "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\outputs\\aug9_model_analysis\\Graphical_Abstract.png"
+  ],
+  "roi": "0,485,1024,70",
+  "score_threshold": 0.3,
+  "source_workbook": "C:\\Users\\hanhu\\Box\\NED3_Share\\0_Manuscripts\\Fahim-2026-BubbleID-Flow\\Model_data_Aug9_2026\\values_vf_bc.xlsx",
+  "source_workbook_sha256": "F440DBD557C790D6133E38B020A5F0CFE774B6D42616A1BB6EB3182351235E0C",
+  "temporal_frames": {
+    "10gs_22C": 108,
+    "15gs_20C": 88,
+    "25gs_20C": 95,
+    "5gs_22C": 100
+  },
+  "temporal_voltage": 45.0,
+  "values_workbook": "C:\\Users\\hanhu\\Documents\\Programming\\BubbleID-Flow\\tmp\\aug9_manuscript_update\\values_vf_bc_raw.csv",
+  "values_workbook_sha256": "2EF772FD252C46F14744106BCDAAE7EA9CFD67C6C64865417E49ABFC0475DD7C",
+  "weights": "C:\\Users\\hanhu\\Box\\NED3_Share\\0_Manuscripts\\Fahim-2026-BubbleID-Flow\\Model_data_Aug9_2026\\model_final.pth",
+  "weights_sha256": "6F60969CE876F57A78B53FC61895C99B92CB2E1B6F0E0B30F01FA301236042CD"
+}

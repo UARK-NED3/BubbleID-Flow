@@ -1,0 +1,5 @@
+case_label,states,vapor_area_fraction_min,vapor_area_fraction_max,peak_voltage_v,endpoint_voltage_v,endpoint_vapor_area_fraction,endpoint_change_from_peak,endpoint_relative_change_from_peak,spearman_voltage_vs_vapor_area,spearman_heat_flux_vs_vapor_area
+10gs_22C,8,0.000251,0.197438,52.5,55.0,0.076086,-0.121352,-0.6146334545528217,0.8571428571428572,0.8928571428571429
+15gs_20C,9,0.0,0.189773,55.0,55.0,0.189773,0.0,0.0,1.0,1.0
+25gs_20C,8,0.0,0.112882,57.5,59.0,0.093786,-0.019096000000000002,-0.16916780354706687,0.9285714285714287,0.9285714285714287
+5gs_22C,12,0.023098,0.247385,52.0,52.0,0.247385,0.0,0.0,1.0,1.0

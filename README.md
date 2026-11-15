@@ -5,6 +5,23 @@ Adaptation workspace for segmenting bubbles in flow boiling images.
 Repository scope, evidence, and reuse boundaries are also available in the
 [NED3 resource manifest](.ned3/resource-manifest-v0.1.json).
 
+## Manuscript Reproduction
+
+The paper data, annotations, and the released Mask R-CNN checkpoint are
+archived at [Zenodo record 10.5281/zenodo.22235802](https://doi.org/10.5281/zenodo.22235802).
+The manuscript checkpoint is `ModelWeights/model_final.pth`, SHA-256
+`6f60969ce876f57a78b53fc61895c99b92cb2e1b6f0e0b30f01fa301236042cd`, iteration
+`1999`. Use ROI `0,485,1024,70`, score threshold `0.30`, and a 300-detection
+cap. The public figure source, outputs, and commands are mapped in
+[docs/manuscript_reproducibility.md](docs/manuscript_reproducibility.md).
+
+Do not use `outputs/multimodal/` to reproduce the manuscript vapor-area-fraction
+results. Those June exploratory files predate the manuscript checkpoint and do
+not record a checkpoint hash. The canonical 37-state August table is
+`outputs/aug9_model_analysis/canonical/aug9_state_vapor_area_fraction.csv`; it
+is an archived derived table with explicit provenance. The separately tracked
+45 V sequences provide direct model-inference verification.
+
 ## Purpose
 
 BubbleID was developed for pool boiling imagery. This repository keeps the first goal simple:
