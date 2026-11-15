@@ -25,7 +25,20 @@ def main() -> None:
     parser.add_argument("--mask-rcnn-metrics", required=True)
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--seed", type=int, default=31)
+    parser.add_argument(
+        "--figure-width-in",
+        type=float,
+        default=7.0,
+        help="Final manuscript width in inches; use 7.0 for an ASME two-column figure*.",
+    )
+    parser.add_argument(
+        "--figure-stem",
+        default="Figure_segmentation_baselines",
+        help="Output filename stem, without an extension.",
+    )
     args = parser.parse_args()
+    if args.figure_width_in <= 0:
+        raise ValueError("figure-width-in must be positive")
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -97,7 +110,7 @@ def main() -> None:
     )
     summary["holdout_images"] = len(val_images)
     summary.to_csv(output_dir / "segmentation_baseline_summary.csv", index=False)
-    make_figure(summary, by_image, output_dir)
+    make_figure(summary, by_image, output_dir, args.figure_width_in, args.figure_stem)
 
     manifest = {
         "split": "same-sequence internal holdout",
@@ -221,7 +234,13 @@ def summarize(frame: pd.DataFrame) -> dict[str, float | int]:
     }
 
 
-def make_figure(summary: pd.DataFrame, by_image: pd.DataFrame, output_dir: Path) -> None:
+def make_figure(
+    summary: pd.DataFrame,
+    by_image: pd.DataFrame,
+    output_dir: Path,
+    width_in: float,
+    figure_stem: str,
+) -> None:
     plt.rcParams.update(
         {
             "font.family": "Arial",
@@ -241,7 +260,9 @@ def make_figure(summary: pd.DataFrame, by_image: pd.DataFrame, output_dir: Path)
     colors = {"Otsu morphology": "#999999", "Pixel Gaussian": "#009E73", "Mask R-CNN": "#0072B2"}
     order = ["Otsu morphology", "Pixel Gaussian", "Mask R-CNN"]
     ordered = summary.set_index("method").loc[order]
-    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.55), constrained_layout=True)
+    fig, axes = plt.subplots(
+        1, 3, figsize=(width_in, 2.55 * width_in / 7.2), constrained_layout=True
+    )
     axes[0].bar(order, ordered["mean_union_mask_iou"], color=[colors[item] for item in order])
     axes[0].set(ylabel="Mean union-mask IoU", ylim=(0, 1))
     axes[1].bar(order, ordered["mean_union_mask_dice"], color=[colors[item] for item in order])
@@ -263,7 +284,7 @@ def make_figure(summary: pd.DataFrame, by_image: pd.DataFrame, output_dir: Path)
         for tick in axis.get_xticklabels():
             tick.set_horizontalalignment("right")
     for suffix in ("pdf", "png"):
-        fig.savefig(output_dir / f"Figure_segmentation_baselines.{suffix}", bbox_inches="tight")
+        fig.savefig(output_dir / f"{figure_stem}.{suffix}")
     plt.close(fig)
 
 

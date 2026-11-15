@@ -33,6 +33,17 @@ def main() -> None:
         "--score-thresholds", default="0.05,0.10,0.20,0.30,0.40,0.50,0.70"
     )
     parser.add_argument("--detection-caps", default="50,100,200,300")
+    parser.add_argument(
+        "--figure-width-in",
+        type=float,
+        default=7.0,
+        help="Final manuscript width in inches; use 7.0 for an ASME two-column figure*.",
+    )
+    parser.add_argument(
+        "--figure-stem",
+        default="Figure_5_segmentation_robustness",
+        help="Output filename stem, without an extension.",
+    )
     args = parser.parse_args()
 
     output_dir = Path(args.output_dir)
@@ -41,6 +52,8 @@ def main() -> None:
     caps = [int(value) for value in args.detection_caps.split(",")]
     if not thresholds or not caps or min(caps) <= 0:
         raise ValueError("At least one score threshold and positive detection cap are required")
+    if args.figure_width_in <= 0:
+        raise ValueError("figure-width-in must be positive")
 
     coco = COCO(args.val_json)
     predictions = json.loads(Path(args.predictions_json).read_text(encoding="utf-8"))
@@ -110,7 +123,14 @@ def main() -> None:
     (output_dir / "segmentation_robustness_summary.json").write_text(
         json.dumps(robustness_summary, indent=2, sort_keys=True), encoding="utf-8"
     )
-    make_figure(selected_rows, sensitivity, regime, output_dir)
+    make_figure(
+        selected_rows,
+        sensitivity,
+        regime,
+        output_dir,
+        args.figure_width_in,
+        args.figure_stem,
+    )
     print(json.dumps(robustness_summary, indent=2, sort_keys=True))
 
 
@@ -347,6 +367,8 @@ def make_figure(
     sensitivity: pd.DataFrame,
     regime: pd.DataFrame,
     output_dir: Path,
+    width_in: float,
+    figure_stem: str,
 ) -> None:
     plt.rcParams.update(
         {
@@ -364,7 +386,9 @@ def make_figure(
             "savefig.dpi": 300,
         }
     )
-    fig, axes = plt.subplots(2, 2, figsize=(7.2, 5.6), constrained_layout=True)
+    fig, axes = plt.subplots(
+        2, 2, figsize=(width_in, 5.6 * width_in / 7.2), constrained_layout=True
+    )
     blue, orange, green = "#0072B2", "#D55E00", "#009E73"
 
     ax = axes[0, 0]
@@ -405,7 +429,7 @@ def make_figure(
         ax.grid(False)
 
     for suffix in ("pdf", "png"):
-        fig.savefig(output_dir / f"Figure_5_segmentation_robustness.{suffix}", bbox_inches="tight")
+        fig.savefig(output_dir / f"{figure_stem}.{suffix}")
     plt.close(fig)
 
 
