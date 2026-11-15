@@ -38,7 +38,20 @@ def main() -> None:
     parser.add_argument("--thermal-summary", required=True)
     parser.add_argument("--temporal-summary", required=True)
     parser.add_argument("--output-dir", required=True)
+    parser.add_argument(
+        "--figure-width-in",
+        type=float,
+        default=7.0,
+        help="Final manuscript width in inches; use 7.0 for an ASME two-column figure*.",
+    )
+    parser.add_argument(
+        "--figure-stem",
+        default="Figure_6_optical_thermal_association",
+        help="Output filename stem, without an extension.",
+    )
     args = parser.parse_args()
+    if args.figure_width_in <= 0:
+        raise ValueError("figure-width-in must be positive")
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -107,7 +120,14 @@ def main() -> None:
     (output_dir / "optical_thermal_association_manifest.json").write_text(
         json.dumps(manifest, indent=2), encoding="utf-8"
     )
-    make_figure(merged, temporal, cv_summary, output_dir)
+    make_figure(
+        merged,
+        temporal,
+        cv_summary,
+        output_dir,
+        args.figure_width_in,
+        args.figure_stem,
+    )
     print(case_summary.to_string(index=False))
     print(cv_summary.to_string(index=False))
     print(f"Residual correlation: {residual_correlation:.3f}")
@@ -187,6 +207,8 @@ def make_figure(
     temporal: pd.DataFrame,
     cv_summary: pd.DataFrame,
     output_dir: Path,
+    width_in: float,
+    figure_stem: str,
 ) -> None:
     plt.rcParams.update(
         {
@@ -205,7 +227,10 @@ def make_figure(
             "savefig.dpi": 300,
         }
     )
-    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.85), constrained_layout=True)
+    fig, axes = plt.subplots(1, 3, figsize=(width_in, 3.2 * width_in / 7.2))
+    # The shared case legend is part of the figure, not an out-of-bounds
+    # decoration that would be lost when tight cropping is disabled.
+    fig.subplots_adjust(bottom=0.22, top=0.79, wspace=0.32)
     for case, (color, marker, label) in CASE_STYLE.items():
         group = merged[merged["case_label"] == case].sort_values("state_voltage")
         valid = group.dropna(subset=["heat_flux_mean_w_cm2", OPTICAL_FEATURE])
@@ -264,9 +289,9 @@ def make_figure(
             spine.set_visible(True)
             spine.set_color("black")
     handles, labels = axes[0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, -0.01))
+    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 0.99))
     for suffix in ("pdf", "png"):
-        fig.savefig(output_dir / f"Figure_6_optical_thermal_association.{suffix}", bbox_inches="tight")
+        fig.savefig(output_dir / f"{figure_stem}.{suffix}")
     plt.close(fig)
 
 

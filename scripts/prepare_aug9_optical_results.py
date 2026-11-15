@@ -58,6 +58,22 @@ def main() -> None:
     parser.add_argument("--temporal-voltage", type=float, default=45.0)
     parser.add_argument("--frame-rate-hz", type=float, default=3000.0)
     parser.add_argument(
+        "--figure-width-in",
+        type=float,
+        default=7.0,
+        help="Final manuscript width in inches; use 7.0 for an ASME two-column figure*.",
+    )
+    parser.add_argument(
+        "--model-figure-stem",
+        default="Figure_4_aug9_model_outputs",
+        help="Output filename stem for the model-output figure, without an extension.",
+    )
+    parser.add_argument(
+        "--optical-figure-stem",
+        default="Figure_5_aug9_optical_results",
+        help="Output filename stem for the optical-results figure, without an extension.",
+    )
+    parser.add_argument(
         "--max-temporal-frames",
         type=int,
         default=None,
@@ -75,6 +91,8 @@ def main() -> None:
         raise ValueError("detections-per-image must be positive")
     if args.frame_rate_hz <= 0:
         raise ValueError("frame-rate-hz must be positive")
+    if args.figure_width_in <= 0:
+        raise ValueError("figure-width-in must be positive")
 
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -134,9 +152,19 @@ def main() -> None:
 
     set_style()
     generated = []
-    generated += figure_model_outputs(representative, output_dir)
-    generated += figure_optical_results(optical, merged, temporal, temporal_summary, output_dir)
-    generated += figure_multimodal_context(merged, output_dir)
+    generated += figure_model_outputs(
+        representative, output_dir, args.figure_width_in, args.model_figure_stem
+    )
+    generated += figure_optical_results(
+        optical,
+        merged,
+        temporal,
+        temporal_summary,
+        output_dir,
+        args.figure_width_in,
+        args.optical_figure_stem,
+    )
+    generated += figure_multimodal_context(merged, output_dir, args.figure_width_in)
     generated += figure_graphical_abstract(representative, merged, temporal_summary, output_dir)
 
     manifest = {
@@ -152,6 +180,7 @@ def main() -> None:
         "detections_per_image": args.detections_per_image,
         "frame_rate_hz": args.frame_rate_hz,
         "temporal_voltage": args.temporal_voltage,
+        "figure_width_in": args.figure_width_in,
         "temporal_frames": {
             case: int(count) for case, count in temporal.groupby("case_label").size().items()
         },
@@ -481,8 +510,10 @@ def set_style() -> None:
 def save_both(fig: plt.Figure, base: Path) -> list[Path]:
     pdf = base.with_suffix(".pdf")
     png = base.with_suffix(".png")
-    fig.savefig(pdf, bbox_inches="tight")
-    fig.savefig(png, dpi=500, bbox_inches="tight")
+    # Retain the requested media-box width. Tight cropping would silently
+    # rescale figure text in the final journal layout.
+    fig.savefig(pdf)
+    fig.savefig(png, dpi=500)
     plt.close(fig)
     return [pdf, png]
 
@@ -500,9 +531,14 @@ def panel_label(ax: plt.Axes, label: str) -> None:
 
 
 def figure_model_outputs(
-    representative: dict[str, dict[str, Path]], output_dir: Path
+    representative: dict[str, dict[str, Path]],
+    output_dir: Path,
+    width_in: float,
+    figure_stem: str,
 ) -> list[Path]:
-    fig, axes = plt.subplots(4, 2, figsize=(7.2, 2.65), constrained_layout=True)
+    fig, axes = plt.subplots(
+        4, 2, figsize=(width_in, 2.65 * width_in / 7.2), constrained_layout=True
+    )
     for row, case in enumerate(CASE_STYLE):
         _, _, label = CASE_STYLE[case]
         raw = cv2.cvtColor(cv2.imread(str(representative[case]["raw"])), cv2.COLOR_BGR2RGB)
@@ -526,7 +562,7 @@ def figure_model_outputs(
     axes[0, 1].set_title("Fine-tuned Mask R-CNN overlay")
     panel_label(axes[0, 0], "a")
     panel_label(axes[0, 1], "b")
-    return save_both(fig, output_dir / "Figure_4_aug9_model_outputs")
+    return save_both(fig, output_dir / figure_stem)
 
 
 def figure_optical_results(
@@ -535,8 +571,13 @@ def figure_optical_results(
     temporal: pd.DataFrame,
     temporal_summary: pd.DataFrame,
     output_dir: Path,
+    width_in: float,
+    figure_stem: str,
 ) -> list[Path]:
-    fig, axes = plt.subplots(2, 2, figsize=(7.2, 5.4), constrained_layout=True)
+    fig, axes = plt.subplots(2, 2, figsize=(width_in, 5.4 * width_in / 7.2))
+    # Reserve physical space for the shared legend so it remains in the PDF
+    # media box without relying on tight cropping.
+    fig.subplots_adjust(bottom=0.13, hspace=0.42, wspace=0.30)
     ax0, ax1, ax2, ax3 = axes.ravel()
     for case in CASE_STYLE:
         color, marker, label = CASE_STYLE[case]
@@ -596,7 +637,7 @@ def figure_optical_results(
     ax3.plot([lower - pad, upper + pad], [lower - pad, upper + pad], "--", color="#555555")
     ax3.set_xlim(lower - pad, upper + pad)
     ax3.set_ylim(lower - pad, upper + pad)
-    ax3.set_xlabel("Archived state-summary vapor area fraction")
+    ax3.set_xlabel("State-summary vapor area fraction")
     ax3.set_ylabel("Frame-sequence mean vapor area fraction")
     mae = float(np.mean(np.abs(temporal_summary["mean_minus_workbook"])))
     for label, ax in zip("abcd", axes.ravel(), strict=True):
@@ -607,12 +648,16 @@ def figure_optical_results(
             spine.set_visible(True)
             spine.set_color("black")
     handles, labels = ax0.get_legend_handles_labels()
-    fig.legend(handles, labels, loc="upper center", ncol=4, frameon=False, bbox_to_anchor=(0.5, -0.01))
-    return save_both(fig, output_dir / "Figure_5_aug9_optical_results")
+    fig.legend(handles, labels, loc="lower center", ncol=4, frameon=False, bbox_to_anchor=(0.5, 0.01))
+    return save_both(fig, output_dir / figure_stem)
 
 
-def figure_multimodal_context(merged: pd.DataFrame, output_dir: Path) -> list[Path]:
-    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.65), constrained_layout=True)
+def figure_multimodal_context(
+    merged: pd.DataFrame, output_dir: Path, width_in: float
+) -> list[Path]:
+    fig, axes = plt.subplots(
+        1, 3, figsize=(width_in, 2.65 * width_in / 7.2), constrained_layout=True
+    )
     ax0, ax1, ax2 = axes
     for case in CASE_STYLE:
         color, marker, label = CASE_STYLE[case]
